@@ -150,7 +150,7 @@ class PostDocumentJournalEntries
         $this->settleSourceDocument($entry, $settings->receivable_account_id, $salesReturn->shipment);
 
         $cost = $this->movementCost(
-            $salesReturn->items->where('disposition', SalesReturnDisposition::Restock),
+            $salesReturn->items->whereIn('disposition', [SalesReturnDisposition::Restock, SalesReturnDisposition::Refurbish]),
             StockMovementType::SalesReturnIn,
         );
 

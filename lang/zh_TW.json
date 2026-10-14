@@ -429,5 +429,7 @@
     "A refurbished product cannot have a refurbished product of its own.": "整新品產品不可再有自己的整新品產品。",
     "The product is already the refurbished product of another product.": "此產品已是其他產品的整新品產品。",
     "The refurbished product needs the same stock unit and tracking.": "整新品產品需要與原產品相同的庫存單位與批號追蹤方式。",
-    "Products with a refurbished product cannot be deleted.": "有整新品關聯的產品不能刪除。"
+    "Products with a refurbished product cannot be deleted.": "有整新品關聯的產品不能刪除。",
+    "The product has no refurbished product.": "此產品沒有設定整新品產品。",
+    "The refurbished product no longer matches the product.": "整新品產品已與原產品不一致，請重新設定。"
 }

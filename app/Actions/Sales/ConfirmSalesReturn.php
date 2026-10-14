@@ -11,6 +11,7 @@ use App\Enums\StockMovementType;
 use App\Models\SalesReturn;
 use App\Models\SalesReturnItem;
 use App\Models\ShipmentItem;
+use App\Models\StockLot;
 use App\Models\StockMovement;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -39,7 +40,7 @@ class ConfirmSalesReturn
 
             CreateSalesReturn::refreshWholeLots($document);
 
-            $document->load(['items.product.unit', 'shipment.items.salesOrderItem.unit', 'shipment.items.product.unit']);
+            $document->load(['items.product.unit', 'items.product.refurbishedProduct', 'items.stockLot', 'shipment.items.salesOrderItem.unit', 'shipment.items.product.unit']);
 
             $shippedByProduct = [];
             foreach ($document->shipment->items as $shipmentItem) {
@@ -69,16 +70,37 @@ class ConfirmSalesReturn
             }
 
             foreach ($document->items as $line) {
+                $target = $line->product;
+                $stockLotId = $line->stock_lot_id;
+
+                if ($line->disposition === SalesReturnDisposition::Refurbish) {
+                    $target = $line->product->refurbishedProduct;
+
+                    abort_if(
+                        $target === null || $target->unit_id !== $line->product->unit_id || $target->tracking !== $line->product->tracking,
+                        409,
+                        __('The refurbished product no longer matches the product.'),
+                    );
+
+                    if ($stockLotId !== null) {
+                        $stockLotId = StockLot::query()->firstOrCreate([
+                            'team_id' => $document->team_id,
+                            'product_id' => $target->id,
+                            'lot_no' => $line->stockLot->lot_no,
+                        ])->id;
+                    }
+                }
+
                 $returned = $this->recordStockMovement->handle(
                     reference: $line,
                     teamId: $document->team_id,
                     warehouseId: $document->warehouse_id,
-                    product: $line->product,
+                    product: $target,
                     type: StockMovementType::SalesReturnIn,
                     quantity: (float) $line->quantity,
                     user: $user,
                     unitCostInBaseCurrency: $this->shippedUnitCost($document, $line->product_id),
-                    stockLotId: $line->stock_lot_id,
+                    stockLotId: $stockLotId,
                 );
 
                 if ($line->disposition === SalesReturnDisposition::Scrap) {

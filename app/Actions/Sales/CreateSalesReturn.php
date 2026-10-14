@@ -6,6 +6,7 @@ use App\Actions\Inventory\LotQuantities;
 use App\Actions\Purchasing\CreatePurchaseReturn;
 use App\Enums\DocumentStatus;
 use App\Enums\DocumentType;
+use App\Enums\SalesReturnDisposition;
 use App\Models\SalesReturn;
 use App\Models\Shipment;
 use App\Models\ShipmentItem;
@@ -77,6 +78,10 @@ class CreateSalesReturn
 
             if ($shipmentLine === null) {
                 throw ValidationException::withMessages(["items.{$index}.product_id" => __('The product must belong to the source document.')]);
+            }
+
+            if ($line['disposition'] === SalesReturnDisposition::Refurbish->value && $shipmentLine->product->refurbished_product_id === null) {
+                throw ValidationException::withMessages(["items.{$index}.disposition" => __('The product has no refurbished product.')]);
             }
 
             $stockLotId = isset($line['stock_lot_id']) ? (int) $line['stock_lot_id'] : null;
