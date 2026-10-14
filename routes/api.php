@@ -173,6 +173,11 @@ Route::prefix('v1/{team}')
                 Route::delete('suppliers/{productSupplier}', 'destroySupplier')->name('suppliers.destroy');
                 Route::get('purchase-price', 'showPurchasePrice')->name('purchase-price');
 
+                Route::get('discounts', 'listDiscounts')->name('discounts.index');
+                Route::post('discounts', 'storeDiscount')->name('discounts.store');
+                Route::patch('discounts/{discount}', 'updateDiscount')->name('discounts.update');
+                Route::delete('discounts/{discount}', 'destroyDiscount')->name('discounts.destroy');
+
                 Route::get('reordering-rules', 'listReorderingRules')->name('reordering-rules.index');
                 Route::post('reordering-rules', 'storeReorderingRule')->name('reordering-rules.store');
                 Route::patch('reordering-rules/{reorderingRule}', 'updateReorderingRule')->name('reordering-rules.update');

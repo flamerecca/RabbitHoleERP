@@ -23,6 +23,8 @@ use Illuminate\Support\Carbon;
  * @property-read Unit $unit
  * @property string $quantity
  * @property string $unit_price
+ * @property string|null $list_price
+ * @property string|null $discount_rate
  * @property int|null $tax_rate_id
  * @property-read TaxRate|null $taxRate
  * @property string $shipped_quantity
@@ -30,7 +32,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['sales_order_id', 'product_id', 'unit_id', 'quantity', 'unit_price', 'tax_rate_id', 'shipped_quantity', 'reserved_quantity'])]
+#[Fillable(['sales_order_id', 'product_id', 'unit_id', 'quantity', 'unit_price', 'list_price', 'discount_rate', 'tax_rate_id', 'shipped_quantity', 'reserved_quantity'])]
 class SalesOrderItem extends Model implements HasActivityLog
 {
     /** @use HasFactory<SalesOrderItemFactory> */
@@ -105,6 +107,8 @@ class SalesOrderItem extends Model implements HasActivityLog
         return [
             'quantity' => 'decimal:4',
             'unit_price' => 'decimal:4',
+            'list_price' => 'decimal:4',
+            'discount_rate' => 'decimal:4',
             'shipped_quantity' => 'decimal:4',
             'reserved_quantity' => 'decimal:4',
         ];

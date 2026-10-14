@@ -43,6 +43,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $updated_at
  * @property-read Collection<int, ProductSupplier> $productSuppliers
  * @property-read Collection<int, ReorderingRule> $reorderingRules
+ * @property-read Collection<int, ProductDiscount> $discounts
  */
 #[Fillable(['team_id', 'category_id', 'unit_id', 'purchase_unit_id', 'sku', 'name', 'default_purchase_price', 'default_sales_price', 'reorder_point', 'is_active', 'tracking', 'refurbished_product_id'])]
 class Product extends Model implements HasActivityLog
@@ -99,6 +100,16 @@ class Product extends Model implements HasActivityLog
     public function productSuppliers(): HasMany
     {
         return $this->hasMany(ProductSupplier::class);
+    }
+
+    /**
+     * Get the discount periods of the product.
+     *
+     * @return HasMany<ProductDiscount, $this>
+     */
+    public function discounts(): HasMany
+    {
+        return $this->hasMany(ProductDiscount::class);
     }
 
     /**

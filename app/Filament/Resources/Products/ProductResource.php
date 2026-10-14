@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Products;
 use App\Filament\Resources\Products\Pages\CreateProduct;
 use App\Filament\Resources\Products\Pages\EditProduct;
 use App\Filament\Resources\Products\Pages\ListProducts;
+use App\Filament\Resources\Products\RelationManagers\ProductDiscountsRelationManager;
 use App\Filament\Resources\Products\RelationManagers\ProductSuppliersRelationManager;
 use App\Filament\Resources\Products\RelationManagers\ReorderingRulesRelationManager;
 use App\Filament\Resources\Products\Schemas\ProductForm;
@@ -55,6 +56,7 @@ class ProductResource extends Resource
     {
         return [
             ProductSuppliersRelationManager::class,
+            ProductDiscountsRelationManager::class,
             ReorderingRulesRelationManager::class,
         ];
     }

@@ -18,8 +18,9 @@ class OrderForm
      *
      * @param  Closure(): array<int, string>  $partnerOptions
      * @param  list<string>  $fulfilledFields  Read-only line quantities written back by receipts or shipments.
+     * @param  (Closure(?int, ?string): ?string)|null  $priceHint  Makes the unit price optional and shows the price resolved for a product on the order date.
      */
-    public static function configure(Schema $schema, string $numberAttribute, string $partnerField, string $partnerLabel, Closure $partnerOptions, array $fulfilledFields): Schema
+    public static function configure(Schema $schema, string $numberAttribute, string $partnerField, string $partnerLabel, Closure $partnerOptions, array $fulfilledFields, ?Closure $priceHint = null): Schema
     {
         return DocumentForm::configure($schema, $numberAttribute, [
             Select::make($partnerField)
@@ -33,6 +34,7 @@ class OrderForm
                 ->required(),
             DatePicker::make('order_date')
                 ->default(now())
+                ->live()
                 ->required(),
             Select::make('currency_id')
                 ->label('Currency')
@@ -71,7 +73,12 @@ class OrderForm
                     TextInput::make('unit_price')
                         ->numeric()
                         ->minValue(0)
-                        ->required(),
+                        ->required($priceHint === null)
+                        ->placeholder($priceHint === null ? null : fn (Get $get): ?string => $priceHint(
+                            $get('product_id') === null ? null : (int) $get('product_id'),
+                            $get('../../order_date'),
+                        ))
+                        ->helperText($priceHint === null ? null : fn () => __('Leave empty to use the price of the order date, discount included.')),
                     Select::make('tax_rate_id')
                         ->label('Tax rate')
                         ->options(fn () => TeamOptions::taxRates()),

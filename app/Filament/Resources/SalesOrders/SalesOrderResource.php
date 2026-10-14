@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\SalesOrders;
 
+use App\Actions\Products\ResolveSalesPrice;
 use App\Enums\SalesOrderStatus;
 use App\Filament\Resources\SalesOrders\Pages\CreateSalesOrder;
 use App\Filament\Resources\SalesOrders\Pages\EditSalesOrder;
@@ -9,9 +10,11 @@ use App\Filament\Resources\SalesOrders\Pages\ListSalesOrders;
 use App\Filament\Support\DocumentColumns;
 use App\Filament\Support\OrderForm;
 use App\Filament\Support\TeamOptions;
+use App\Models\Product;
 use App\Models\SalesOrder;
 use BackedEnum;
 use Filament\Actions\EditAction;
+use Filament\Facades\Filament;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -46,7 +49,10 @@ class SalesOrderResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return OrderForm::configure($schema, 'order_no', 'customer_id', 'Customer', fn () => TeamOptions::customers(), ['shipped_quantity', 'reserved_quantity']);
+        return OrderForm::configure($schema, 'order_no', 'customer_id', 'Customer', fn () => TeamOptions::customers(), ['shipped_quantity', 'reserved_quantity'], fn (?int $productId, ?string $orderDate): ?string => $productId === null ? null : app(ResolveSalesPrice::class)->handle(
+            Product::query()->where('team_id', Filament::getTenant()?->getKey())->findOrFail($productId),
+            $orderDate ?? now()->toDateString(),
+        )['unit_price']);
     }
 
     public static function table(Table $table): Table

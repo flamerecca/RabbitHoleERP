@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\Inventory\ReserveSalesOrderStock;
 use App\Actions\Inventory\UnreserveSalesOrderStock;
+use App\Actions\Products\ResolveSalesPrice;
 use App\Enums\DocumentRuleEvent;
 use App\Enums\DocumentType;
 use App\Enums\SalesOrderStatus;
@@ -81,7 +82,7 @@ class SalesOrderController extends Controller
             'items.*.product_id' => ['required', 'integer', Rule::exists('products', 'id')->where('team_id', $team->id)],
             'items.*.unit_id' => ['nullable', 'integer', Rule::exists('units', 'id')->where('team_id', $team->id)],
             'items.*.quantity' => ['required', 'numeric', 'gt:0'],
-            'items.*.unit_price' => ['required', 'numeric', 'min:0'],
+            'items.*.unit_price' => ['nullable', 'numeric', 'min:0'],
             'items.*.tax_rate_id' => ['nullable', 'integer', Rule::exists('tax_rates', 'id')->where('team_id', $team->id)],
         ]);
 
@@ -96,7 +97,9 @@ class SalesOrderController extends Controller
             }
         }
 
-        $result = DB::transaction(function () use ($data, $team, $request, $documentSequence, $documentRuleEvaluator) {
+        $prices = $this->linePrices($data['items'], $data['order_date']);
+
+        $result = DB::transaction(function () use ($data, $prices, $team, $request, $documentSequence, $documentRuleEvaluator) {
             $order = new SalesOrder();
             $order->team_id = $team->id;
             $order->customer_id = $data['customer_id'];
@@ -109,14 +112,16 @@ class SalesOrderController extends Controller
             $order->created_by = $request->user()->id;
             $order->save();
 
-            foreach ($data['items'] as $line) {
+            foreach ($data['items'] as $i => $line) {
                 $product = Product::whereKey($line['product_id'])->firstOrFail();
                 $item = new SalesOrderItem();
                 $item->sales_order_id = $order->id;
                 $item->product_id = $line['product_id'];
                 $item->unit_id = $line['unit_id'] ?? $product->unit_id;
                 $item->quantity = $line['quantity'];
-                $item->unit_price = $line['unit_price'];
+                $item->unit_price = $prices[$i]['unit_price'];
+                $item->list_price = $prices[$i]['list_price'];
+                $item->discount_rate = $prices[$i]['discount_rate'];
                 $item->tax_rate_id = $line['tax_rate_id'] ?? null;
                 $item->shipped_quantity = '0';
                 $item->save();
@@ -159,7 +164,7 @@ class SalesOrderController extends Controller
             'items.*.product_id' => ['required', 'integer', Rule::exists('products', 'id')->where('team_id', $team->id)],
             'items.*.unit_id' => ['nullable', 'integer', Rule::exists('units', 'id')->where('team_id', $team->id)],
             'items.*.quantity' => ['required', 'numeric', 'gt:0'],
-            'items.*.unit_price' => ['required', 'numeric', 'min:0'],
+            'items.*.unit_price' => ['nullable', 'numeric', 'min:0'],
             'items.*.tax_rate_id' => ['nullable', 'integer', Rule::exists('tax_rates', 'id')->where('team_id', $team->id)],
         ]);
 
@@ -173,7 +178,9 @@ class SalesOrderController extends Controller
             }
         }
 
-        $result = DB::transaction(function () use ($data, $team, $salesOrder, $documentRuleEvaluator) {
+        $prices = isset($data['items']) ? $this->linePrices($data['items'], $data['order_date'] ?? $salesOrder->order_date->toDateString()) : [];
+
+        $result = DB::transaction(function () use ($data, $prices, $team, $salesOrder, $documentRuleEvaluator) {
             $order = SalesOrder::lockForUpdate()->findOrFail($salesOrder->id);
             if ($order->status != SalesOrderStatus::Draft) {
                 abort(409, __('Only draft sales orders can be updated.'));
@@ -187,15 +194,29 @@ class SalesOrderController extends Controller
             $order->save();
 
             if (isset($data['items'])) {
-                $order->items()->get()->each->delete();
-                foreach ($data['items'] as $line) {
+                $previous = $order->items()->orderBy('id')->get();
+                $snapshots = [];
+                foreach ($previous as $item) {
+                    if ($item->discount_rate !== null) {
+                        $snapshots[$item->product_id.'|'.number_format((float) $item->unit_price, 4, '.', '')][] = [$item->list_price, $item->discount_rate];
+                    }
+                }
+                $previous->each->delete();
+                foreach ($data['items'] as $i => $line) {
                     $product = Product::whereKey($line['product_id'])->firstOrFail();
+                    $price = $prices[$i];
+                    if (isset($line['unit_price'])) {
+                        $key = $line['product_id'].'|'.number_format((float) $line['unit_price'], 4, '.', '');
+                        [$price['list_price'], $price['discount_rate']] = isset($snapshots[$key]) ? array_shift($snapshots[$key]) ?? [null, null] : [null, null];
+                    }
                     $item = new SalesOrderItem();
                     $item->sales_order_id = $order->id;
                     $item->product_id = $line['product_id'];
                     $item->unit_id = $line['unit_id'] ?? $product->unit_id;
                     $item->quantity = $line['quantity'];
-                    $item->unit_price = $line['unit_price'];
+                    $item->unit_price = $price['unit_price'];
+                    $item->list_price = $price['list_price'];
+                    $item->discount_rate = $price['discount_rate'];
                     $item->tax_rate_id = $line['tax_rate_id'] ?? null;
                     $item->shipped_quantity = '0';
                     $item->save();
@@ -228,7 +249,7 @@ class SalesOrderController extends Controller
             'product_id' => ['required', 'integer', Rule::exists('products', 'id')->where('team_id', $team->id)],
             'unit_id' => ['nullable', 'integer', Rule::exists('units', 'id')->where('team_id', $team->id)],
             'quantity' => ['required', 'numeric', 'gt:0'],
-            'unit_price' => ['required', 'numeric', 'min:0'],
+            'unit_price' => ['nullable', 'numeric', 'min:0'],
             'tax_rate_id' => ['nullable', 'integer', Rule::exists('tax_rates', 'id')->where('team_id', $team->id)],
         ]);
 
@@ -240,7 +261,9 @@ class SalesOrderController extends Controller
             }
         }
 
-        $result = DB::transaction(function () use ($line, $product, $team, $salesOrder, $documentRuleEvaluator, $reserveSalesOrderStock) {
+        $price = $this->linePrice($product, $line, $salesOrder->order_date->toDateString(), 'unit_price');
+
+        $result = DB::transaction(function () use ($line, $price, $product, $team, $salesOrder, $documentRuleEvaluator, $reserveSalesOrderStock) {
             $order = SalesOrder::lockForUpdate()->findOrFail($salesOrder->id);
             if (! in_array($order->status, [SalesOrderStatus::Draft, SalesOrderStatus::Confirmed, SalesOrderStatus::PartiallyShipped])) {
                 abort(409, __('Lines can only be added to draft, confirmed or partially shipped sales orders.'));
@@ -251,7 +274,9 @@ class SalesOrderController extends Controller
             $item->product_id = $product->id;
             $item->unit_id = $line['unit_id'] ?? $product->unit_id;
             $item->quantity = $line['quantity'];
-            $item->unit_price = $line['unit_price'];
+            $item->unit_price = $price['unit_price'];
+            $item->list_price = $price['list_price'];
+            $item->discount_rate = $price['discount_rate'];
             $item->tax_rate_id = $line['tax_rate_id'] ?? null;
             $item->shipped_quantity = '0';
             $item->save();
@@ -351,6 +376,44 @@ class SalesOrderController extends Controller
     }
 
     /**
+     * Resolve the unit price and discount snapshot of every order line before anything is written.
+     *
+     * @param  list<array<string, mixed>>  $lines
+     * @return array<int|string, array{unit_price: string, list_price: string|null, discount_rate: string|null}>
+     */
+    private function linePrices(array $lines, string $orderDate): array
+    {
+        $prices = [];
+        foreach ($lines as $i => $line) {
+            $product = Product::whereKey($line['product_id'])->firstOrFail();
+            $prices[$i] = $this->linePrice($product, $line, $orderDate, "items.$i.unit_price");
+        }
+
+        return $prices;
+    }
+
+    /**
+     * Resolve the unit price and discount snapshot of an order line, keeping an explicit unit price as it is.
+     *
+     * @param  array<string, mixed>  $line
+     * @return array{unit_price: string, list_price: string|null, discount_rate: string|null}
+     */
+    private function linePrice(Product $product, array $line, string $orderDate, string $errorKey): array
+    {
+        if (isset($line['unit_price'])) {
+            return ['unit_price' => (string) $line['unit_price'], 'list_price' => null, 'discount_rate' => null];
+        }
+
+        $resolved = app(ResolveSalesPrice::class)->handle($product, $orderDate);
+
+        if ($resolved['unit_price'] === null) {
+            throw ValidationException::withMessages([$errorKey => __('The product has no default sales price, so the unit price is required.')]);
+        }
+
+        return $resolved;
+    }
+
+    /**
      * @return array<string, mixed>
      */
     private function salesOrderToArray(SalesOrder $order): array
@@ -363,6 +426,8 @@ class SalesOrderController extends Controller
                 'unit_id' => $item->unit_id,
                 'quantity' => (float) $item->quantity,
                 'unit_price' => (float) $item->unit_price,
+                'list_price' => $item->list_price === null ? null : (float) $item->list_price,
+                'discount_rate' => $item->discount_rate === null ? null : (float) $item->discount_rate,
                 'tax_rate_id' => $item->tax_rate_id,
                 'subtotal' => round((float) $item->quantity * (float) $item->unit_price, 4),
                 'shipped_quantity' => (float) $item->shipped_quantity,

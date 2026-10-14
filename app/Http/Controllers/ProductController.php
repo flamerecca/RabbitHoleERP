@@ -20,6 +20,7 @@ use App\Enums\SalesOrderStatus;
 use App\Enums\StockMovementType;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Models\ProductDiscount;
 use App\Models\ProductSupplier;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
@@ -732,6 +733,118 @@ class ProductController extends Controller
         $productSupplier->delete();
 
         return response()->noContent();
+    }
+
+    /**
+     * List the discount periods of the product.
+     */
+    public function listDiscounts(Request $request, Team $team, Product $product): JsonResponse
+    {
+        $validated = $request->validate([
+            'page' => ['nullable', 'integer', 'min:1'],
+            'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
+        ]);
+
+        $paginator = ProductDiscount::query()
+            ->where('team_id', $team->id)
+            ->where('product_id', $product->id)
+            ->orderBy('starts_on')
+            ->orderBy('id')
+            ->paginate($validated['per_page'] ?? 15)
+            ->withQueryString();
+
+        $data = collect($paginator->items())->map(fn (ProductDiscount $discount) => $this->productDiscountPayload($discount));
+
+        return $this->paginatedResponse($paginator, $data);
+    }
+
+    /**
+     * Create a discount period, rejecting a period overlapping another active discount of the product.
+     */
+    public function storeDiscount(Request $request, Team $team, Product $product): JsonResponse
+    {
+        $validated = $request->validate([
+            'discount_rate' => ['required', 'numeric', 'gt:0', 'lte:100'],
+            'starts_on' => ['required', 'date_format:Y-m-d'],
+            'ends_on' => ['required', 'date_format:Y-m-d', 'after_or_equal:starts_on'],
+            'is_active' => ['sometimes', 'boolean'],
+        ]);
+
+        $discount = DB::transaction(function () use ($team, $product, $validated) {
+            Product::query()->whereKey($product->id)->lockForUpdate()->first();
+            $this->assertDiscountDoesNotOverlap($product, $validated['starts_on'], $validated['ends_on'], $validated['is_active'] ?? true, null);
+
+            return ProductDiscount::create([...$validated, 'is_active' => $validated['is_active'] ?? true, 'team_id' => $team->id, 'product_id' => $product->id]);
+        });
+
+        return response()->json(['data' => $this->productDiscountPayload($discount)], 201);
+    }
+
+    /**
+     * Update the given discount period, changing only the provided fields.
+     */
+    public function updateDiscount(Request $request, Team $team, Product $product, ProductDiscount $discount): JsonResponse
+    {
+        $validated = $request->validate([
+            'discount_rate' => ['sometimes', 'required', 'numeric', 'gt:0', 'lte:100'],
+            'starts_on' => ['sometimes', 'required', 'date_format:Y-m-d'],
+            'ends_on' => ['sometimes', 'required', 'date_format:Y-m-d'],
+            'is_active' => ['sometimes', 'required', 'boolean'],
+        ]);
+
+        $startsOn = $validated['starts_on'] ?? $discount->starts_on->toDateString();
+        $endsOn = $validated['ends_on'] ?? $discount->ends_on->toDateString();
+        if ($endsOn < $startsOn) {
+            throw ValidationException::withMessages(['ends_on' => __('The ends on field must be a date after or equal to starts on.')]);
+        }
+
+        DB::transaction(function () use ($product, $discount, $validated, $startsOn, $endsOn) {
+            Product::query()->whereKey($product->id)->lockForUpdate()->first();
+            $this->assertDiscountDoesNotOverlap($product, $startsOn, $endsOn, $validated['is_active'] ?? $discount->is_active, $discount->id);
+
+            $discount->update($validated);
+        });
+
+        return response()->json(['data' => $this->productDiscountPayload($discount)]);
+    }
+
+    /**
+     * Delete the given discount period.
+     */
+    public function destroyDiscount(Team $team, Product $product, ProductDiscount $discount): Response
+    {
+        $discount->delete();
+
+        return response()->noContent();
+    }
+
+    /**
+     * Reject an active period touching another active discount of the product.
+     */
+    private function assertDiscountDoesNotOverlap(Product $product, string $startsOn, string $endsOn, bool $isActive, ?int $ignoreId): void
+    {
+        if ($isActive && ProductDiscount::query()->overlapping($product->id, $startsOn, $endsOn, $ignoreId)->exists()) {
+            throw ValidationException::withMessages(['starts_on' => __('The discount period overlaps another active discount of the product.')]);
+        }
+    }
+
+    /**
+     * Build the response shape of a discount period.
+     *
+     * @return array<string, mixed>
+     */
+    private function productDiscountPayload(ProductDiscount $discount): array
+    {
+        return [
+            'id' => $discount->id,
+            'product_id' => $discount->product_id,
+            'discount_rate' => (float) $discount->discount_rate,
+            'starts_on' => $discount->starts_on->toDateString(),
+            'ends_on' => $discount->ends_on->toDateString(),
+            'is_active' => $discount->is_active,
+            'created_at' => $discount->created_at?->toJSON(),
+            'updated_at' => $discount->updated_at?->toJSON(),
+        ];
     }
 
     /**

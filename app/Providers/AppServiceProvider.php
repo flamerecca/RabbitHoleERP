@@ -16,6 +16,7 @@ use App\Models\UnbuildOrder;
 use App\Models\UnbuildOrderItem;
 use App\Models\Payment;
 use App\Models\Product;
+use App\Models\ProductDiscount;
 use App\Models\ProductSupplier;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
@@ -89,6 +90,7 @@ class AppServiceProvider extends ServiceProvider
         Relation::morphMap([
             'product' => Product::class,
             'product_supplier' => ProductSupplier::class,
+            'product_discount' => ProductDiscount::class,
             'reordering_rule' => ReorderingRule::class,
             'purchase_order' => PurchaseOrder::class,
             'purchase_order_item' => PurchaseOrderItem::class,
