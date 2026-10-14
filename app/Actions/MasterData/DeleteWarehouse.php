@@ -25,6 +25,7 @@ class DeleteWarehouse
         ['warehouse_transfers', 'to_warehouse_id'],
         ['stock_takes', 'warehouse_id'],
         ['material_requisitions', 'warehouse_id'],
+        ['scrap_orders', 'warehouse_id'],
         ['reordering_rules', 'warehouse_id'],
     ];
 

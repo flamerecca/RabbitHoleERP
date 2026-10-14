@@ -396,5 +396,7 @@
     "Only draft scrap orders can be confirmed.": "只有草稿狀態的報廢單可以確認。",
     "Only draft scrap orders can be cancelled.": "只有草稿狀態的報廢單可以取消。",
     "Scrap order": "報廢單",
-    "Scrap orders": "報廢單"
+    "Scrap orders": "報廢單",
+    "record.scrap_order": "報廢單",
+    "record.scrap_order_item": "報廢單明細"
 }

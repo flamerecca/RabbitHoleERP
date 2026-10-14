@@ -24,6 +24,7 @@ class DeleteProduct
         'warehouse_transfer_items',
         'stock_take_items',
         'material_requisition_items',
+        'scrap_order_items',
     ];
 
     /**

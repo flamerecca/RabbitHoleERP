@@ -359,6 +359,7 @@ class ProductController extends Controller
             'warehouse_transfer' => ['warehouse_transfers', 'transfer_no'],
             'stock_take' => ['stock_takes', 'take_no'],
             'material_requisition' => ['material_requisitions', 'requisition_no'],
+            'scrap_order' => ['scrap_orders', 'scrap_no'],
         ];
         $itemDocuments = [
             'goods_receipt_item' => ['goods_receipt_items', 'goods_receipt_id', 'goods_receipt'],
@@ -368,6 +369,7 @@ class ProductController extends Controller
             'warehouse_transfer_item' => ['warehouse_transfer_items', 'warehouse_transfer_id', 'warehouse_transfer'],
             'stock_take_item' => ['stock_take_items', 'stock_take_id', 'stock_take'],
             'material_requisition_item' => ['material_requisition_items', 'material_requisition_id', 'material_requisition'],
+            'scrap_order_item' => ['scrap_order_items', 'scrap_order_id', 'scrap_order'],
         ];
 
         /** @var array<string, array<int, array{type: string, id: int, number: string}>> $documents */

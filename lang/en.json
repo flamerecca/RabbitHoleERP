@@ -47,5 +47,7 @@
     "record.material_requisition_item": "Material requisition item",
     "activity.created": "Created",
     "activity.updated": "Updated",
-    "activity.deleted": "Deleted"
+    "activity.deleted": "Deleted",
+    "record.scrap_order": "Scrap order",
+    "record.scrap_order_item": "Scrap order item"
 }
