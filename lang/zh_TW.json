@@ -418,5 +418,8 @@
     "record.manufacturing_order_item": "生產單明細",
     "Only draft manufacturing orders can be confirmed.": "只有草稿狀態的生產單可以確認。",
     "Only confirmed manufacturing orders can be completed.": "只有已確認的生產單可以完成。",
-    "Only draft or confirmed manufacturing orders can be cancelled.": "只有草稿或已確認的生產單可以取消。"
+    "Only draft or confirmed manufacturing orders can be cancelled.": "只有草稿或已確認的生產單可以取消。",
+    "Manufacturing order": "生產單",
+    "Manufacturing orders": "生產單",
+    "Complete": "完成"
 }

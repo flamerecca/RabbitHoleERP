@@ -70,5 +70,8 @@
     "record.manufacturing_order_item": "Manufacturing order item",
     "Only draft manufacturing orders can be confirmed.": "Only draft manufacturing orders can be confirmed.",
     "Only confirmed manufacturing orders can be completed.": "Only confirmed manufacturing orders can be completed.",
-    "Only draft or confirmed manufacturing orders can be cancelled.": "Only draft or confirmed manufacturing orders can be cancelled."
+    "Only draft or confirmed manufacturing orders can be cancelled.": "Only draft or confirmed manufacturing orders can be cancelled.",
+    "Manufacturing order": "Manufacturing order",
+    "Manufacturing orders": "Manufacturing orders",
+    "Complete": "Complete"
 }
