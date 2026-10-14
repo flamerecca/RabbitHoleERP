@@ -14,7 +14,7 @@ class CreateUnbuildOrder
 {
     public function __construct(
         protected DocumentSequence $documentSequence,
-        protected PrepareUnbuildOrder $prepare,
+        protected ExpandActiveBom $expandBom,
     ) {
     }
 
@@ -25,22 +25,22 @@ class CreateUnbuildOrder
      */
     public function handle(Team $team, User $user, array $attributes): UnbuildOrder
     {
-        $prepared = $this->prepare->handle($team, $attributes['product_id'], $attributes['quantity'], $attributes['warehouse_id']);
+        $expanded = $this->expandBom->handle($team, $attributes['product_id'], $attributes['quantity'], $attributes['warehouse_id']);
 
-        return DB::transaction(function () use ($team, $user, $attributes, $prepared) {
+        return DB::transaction(function () use ($team, $user, $attributes, $expanded) {
             $order = UnbuildOrder::create([
                 'team_id' => $team->id,
                 'unbuild_no' => $this->documentSequence->next($team, DocumentType::UnbuildOrder, now()),
                 'warehouse_id' => $attributes['warehouse_id'],
                 'product_id' => $attributes['product_id'],
-                'bom_id' => $prepared['bom']->id,
+                'bom_id' => $expanded['bom']->id,
                 'quantity' => $attributes['quantity'],
                 'status' => DocumentStatus::Draft,
                 'reason' => $attributes['reason'] ?? null,
                 'created_by' => $user->id,
             ]);
 
-            $order->items()->createMany($prepared['items']);
+            $order->items()->createMany($expanded['items']);
 
             return $order->fresh('items');
         });

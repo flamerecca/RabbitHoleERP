@@ -8,7 +8,7 @@ use App\Models\Team;
 use App\Models\Warehouse;
 use Illuminate\Validation\ValidationException;
 
-class PrepareUnbuildOrder
+class ExpandActiveBom
 {
     public function __construct(protected BomComponentFactor $factor)
     {

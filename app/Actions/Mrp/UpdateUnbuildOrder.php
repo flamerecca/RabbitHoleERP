@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 class UpdateUnbuildOrder
 {
-    public function __construct(protected PrepareUnbuildOrder $prepare)
+    public function __construct(protected ExpandActiveBom $expandBom)
     {
     }
 
@@ -32,11 +32,11 @@ class UpdateUnbuildOrder
                 && round((float) $attributes['quantity'], 4) !== round((float) $order->quantity, 4);
 
             if ($quantityChanged) {
-                $prepared = $this->prepare->handle($order->team, $order->product_id, $attributes['quantity']);
+                $expanded = $this->expandBom->handle($order->team, $order->product_id, $attributes['quantity']);
 
-                $order->update(['quantity' => $attributes['quantity'], 'bom_id' => $prepared['bom']->id]);
+                $order->update(['quantity' => $attributes['quantity'], 'bom_id' => $expanded['bom']->id]);
                 $order->items()->get()->each->delete();
-                $order->items()->createMany($prepared['items']);
+                $order->items()->createMany($expanded['items']);
             }
 
             return $order->fresh('items');

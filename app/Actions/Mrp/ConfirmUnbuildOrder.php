@@ -19,6 +19,7 @@ class ConfirmUnbuildOrder
         protected RecordStockMovement $recordStockMovement,
         protected EnsureStockAvailable $ensureStockAvailable,
         protected AllocateStockLots $allocateStockLots,
+        protected SplitCostLayers $splitCostLayers,
     ) {
     }
 
@@ -97,7 +98,7 @@ class ConfirmUnbuildOrder
                     quantity: $quantity,
                     user: $user,
                     unitCostInBaseCurrency: $share / $quantity,
-                    incomingLayers: $this->costLayers($share, $quantity),
+                    incomingLayers: $this->splitCostLayers->handle($share, $quantity),
                     stockLotId: $stockLotId,
                 );
             }
@@ -106,27 +107,5 @@ class ConfirmUnbuildOrder
 
             return $order->fresh('items');
         });
-    }
-
-    /**
-     * Split the share into cost layers whose values add up to it exactly, as layer unit costs hold four decimals.
-     *
-     * The unit cost is cut down to four decimals for all but one unit, which takes the remainder.
-     *
-     * @return list<array{quantity: float, unit_cost: float}>
-     */
-    protected function costLayers(float $share, float $quantity): array
-    {
-        if ($quantity <= 1) {
-            return [['quantity' => $quantity, 'unit_cost' => $share / $quantity]];
-        }
-
-        $unitCost = floor($share / $quantity * 10000) / 10000;
-        $remainder = round($share - round(($quantity - 1) * $unitCost, 4), 4);
-
-        return [
-            ['quantity' => round($quantity - 1, 4), 'unit_cost' => $unitCost],
-            ['quantity' => 1.0, 'unit_cost' => $remainder],
-        ];
     }
 }
