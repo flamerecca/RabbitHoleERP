@@ -194,16 +194,20 @@ class SalesOrderController extends Controller
             $order->save();
 
             if (isset($data['items'])) {
-                $previous = $order->items()->get();
-                $snapshots = $previous
-                    ->filter(fn (SalesOrderItem $item) => $item->discount_rate !== null)
-                    ->mapWithKeys(fn (SalesOrderItem $item) => [$item->product_id.'|'.number_format((float) $item->unit_price, 4, '.', '') => [$item->list_price, $item->discount_rate]]);
+                $previous = $order->items()->orderBy('id')->get();
+                $snapshots = [];
+                foreach ($previous as $item) {
+                    if ($item->discount_rate !== null) {
+                        $snapshots[$item->product_id.'|'.number_format((float) $item->unit_price, 4, '.', '')][] = [$item->list_price, $item->discount_rate];
+                    }
+                }
                 $previous->each->delete();
                 foreach ($data['items'] as $i => $line) {
                     $product = Product::whereKey($line['product_id'])->firstOrFail();
                     $price = $prices[$i];
                     if (isset($line['unit_price'])) {
-                        [$price['list_price'], $price['discount_rate']] = $snapshots->get($line['product_id'].'|'.number_format((float) $line['unit_price'], 4, '.', ''), [null, null]);
+                        $key = $line['product_id'].'|'.number_format((float) $line['unit_price'], 4, '.', '');
+                        [$price['list_price'], $price['discount_rate']] = isset($snapshots[$key]) ? array_shift($snapshots[$key]) ?? [null, null] : [null, null];
                     }
                     $item = new SalesOrderItem();
                     $item->sales_order_id = $order->id;
@@ -375,14 +379,14 @@ class SalesOrderController extends Controller
      * Resolve the unit price and discount snapshot of every order line before anything is written.
      *
      * @param  list<array<string, mixed>>  $lines
-     * @return list<array{unit_price: string, list_price: string|null, discount_rate: string|null}>
+     * @return array<int|string, array{unit_price: string, list_price: string|null, discount_rate: string|null}>
      */
     private function linePrices(array $lines, string $orderDate): array
     {
         $prices = [];
-        foreach ($lines as $line) {
+        foreach ($lines as $i => $line) {
             $product = Product::whereKey($line['product_id'])->firstOrFail();
-            $prices[] = $this->linePrice($product, $line, $orderDate, 'items.'.count($prices).'.unit_price');
+            $prices[$i] = $this->linePrice($product, $line, $orderDate, "items.$i.unit_price");
         }
 
         return $prices;
