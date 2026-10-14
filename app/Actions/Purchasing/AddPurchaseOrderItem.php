@@ -11,7 +11,6 @@ use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
 use App\Services\DocumentRuleEvaluator;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 
 class AddPurchaseOrderItem
 {
@@ -53,10 +52,6 @@ class AddPurchaseOrderItem
     public function createLine(PurchaseOrder $order, array $line): PurchaseOrderItem
     {
         $product = Product::query()->whereKey($line['product_id'])->firstOrFail();
-
-        if ($product->refurbishedFrom()->exists()) {
-            throw ValidationException::withMessages(['product_id' => __('A refurbished product cannot be purchased.')]);
-        }
 
         return $order->items()->create([
             'product_id' => $product->id,

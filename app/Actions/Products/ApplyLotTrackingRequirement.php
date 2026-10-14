@@ -30,6 +30,9 @@ class ApplyLotTrackingRequirement
     /**
      * Switch the matching products, leaving products with stock movements as they are.
      *
+     * A product linked to a refurbished product switches together with its counterpart, and stays as it is
+     * when the counterpart has stock movements and cannot follow, so the pair keeps the same tracking.
+     *
      * @param  Builder<Product>  $products
      */
     protected function apply(Builder $products): void
@@ -39,6 +42,21 @@ class ApplyLotTrackingRequirement
             ->whereNotIn('id', StockMovement::query()->select('product_id'))
             ->get()
             ->filter(fn (Product $product) => $product->requiresLotTracking())
-            ->each(fn (Product $product) => $product->update(['tracking' => ProductTracking::Lot]));
+            ->each(function (Product $product): void {
+                $counterpart = $product->refurbishedProduct ?? $product->refurbishedFrom;
+
+                if ($counterpart !== null) {
+                    $counterpartCanFollow = $counterpart->tracking === ProductTracking::Lot
+                        || ! StockMovement::query()->where('product_id', $counterpart->id)->exists();
+
+                    if (! $counterpartCanFollow) {
+                        return;
+                    }
+
+                    $counterpart->update(['tracking' => ProductTracking::Lot]);
+                }
+
+                $product->update(['tracking' => ProductTracking::Lot]);
+            });
     }
 }

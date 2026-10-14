@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Carbon;
 
 /**
@@ -35,6 +36,18 @@ class PurchaseOrderItem extends Model implements HasActivityLog
     /** @use HasFactory<PurchaseOrderItemFactory> */
     use HasFactory;
     use RecordsActivity;
+
+    /**
+     * Keep refurbished products off every purchase order, whichever code path creates the line.
+     */
+    protected static function booted(): void
+    {
+        static::creating(function (PurchaseOrderItem $item): void {
+            if (Product::query()->whereKey($item->product_id)->whereHas('refurbishedFrom')->exists()) {
+                throw ValidationException::withMessages(['product_id' => __('A refurbished product cannot be purchased.')]);
+            }
+        });
+    }
 
     /**
      * Get the purchase order of the purchase order item.
