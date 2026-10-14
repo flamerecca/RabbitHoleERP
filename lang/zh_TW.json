@@ -386,5 +386,13 @@
     "The active bills of materials contain a cycle. Fix them and try again.": "啟用中的物料清單含有循環，請修正後再試。",
     "Scrap settings": "報廢設定",
     "Enable scrap orders": "啟用報廢單",
-    "Turning this off hides the scrap orders. Existing scrap orders are kept. Scrap orders also need the MRP module.": "關閉後會隱藏報廢單，既有的報廢單會保留。報廢單也需要啟用 MRP 模組。"
+    "Turning this off hides the scrap orders. Existing scrap orders are kept. Scrap orders also need the MRP module.": "關閉後會隱藏報廢單，既有的報廢單會保留。報廢單也需要啟用 MRP 模組。",
+    "The selected warehouse is invalid.": "所選的倉庫無效。",
+    "The selected product is invalid.": "所選的產品無效。",
+    "A scrap order needs at least one line.": "報廢單至少需要一行明細。",
+    "A product can appear only once on a scrap order.": "同一張報廢單內，同一產品只能出現一次。",
+    "The quantity must be greater than zero.": "數量必須大於 0。",
+    "Only draft scrap orders can be updated.": "只有草稿狀態的報廢單可以修改。",
+    "Only draft scrap orders can be confirmed.": "只有草稿狀態的報廢單可以確認。",
+    "Only draft scrap orders can be cancelled.": "只有草稿狀態的報廢單可以取消。"
 }
