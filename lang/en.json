@@ -67,5 +67,8 @@
     "status.production_output": "Production output",
     "status.done": "Done",
     "record.manufacturing_order": "Manufacturing order",
-    "record.manufacturing_order_item": "Manufacturing order item"
+    "record.manufacturing_order_item": "Manufacturing order item",
+    "Only draft manufacturing orders can be confirmed.": "Only draft manufacturing orders can be confirmed.",
+    "Only confirmed manufacturing orders can be completed.": "Only confirmed manufacturing orders can be completed.",
+    "Only draft or confirmed manufacturing orders can be cancelled.": "Only draft or confirmed manufacturing orders can be cancelled."
 }
