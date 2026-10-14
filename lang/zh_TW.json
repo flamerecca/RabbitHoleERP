@@ -402,5 +402,10 @@
     "status.unbuild_out": "拆解出庫",
     "status.unbuild_in": "拆解入庫",
     "record.unbuild_order": "拆解單",
-    "record.unbuild_order_item": "拆解單明細"
+    "record.unbuild_order_item": "拆解單明細",
+    "The product has no active bill of materials.": "此產品沒有啟用中的物料清單。",
+    "The quantity is too small for the components.": "數量太小，原料拆回量會四捨五入為 0。",
+    "Only draft unbuild orders can be updated.": "只有草稿狀態的拆解單可以修改。",
+    "Only draft unbuild orders can be confirmed.": "只有草稿狀態的拆解單可以確認。",
+    "Only draft unbuild orders can be cancelled.": "只有草稿狀態的拆解單可以取消。"
 }

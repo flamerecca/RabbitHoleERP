@@ -53,5 +53,10 @@
     "status.unbuild_out": "Unbuild out",
     "status.unbuild_in": "Unbuild in",
     "record.unbuild_order": "Unbuild order",
-    "record.unbuild_order_item": "Unbuild order item"
+    "record.unbuild_order_item": "Unbuild order item",
+    "The product has no active bill of materials.": "The product has no active bill of materials.",
+    "The quantity is too small for the components.": "The quantity is too small for the components.",
+    "Only draft unbuild orders can be updated.": "Only draft unbuild orders can be updated.",
+    "Only draft unbuild orders can be confirmed.": "Only draft unbuild orders can be confirmed.",
+    "Only draft unbuild orders can be cancelled.": "Only draft unbuild orders can be cancelled."
 }
