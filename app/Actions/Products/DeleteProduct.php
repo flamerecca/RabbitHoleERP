@@ -26,6 +26,7 @@ class DeleteProduct
         'material_requisition_items',
         'scrap_order_items',
         'unbuild_orders',
+        'manufacturing_orders',
     ];
 
     /**
@@ -42,11 +43,13 @@ class DeleteProduct
                 );
             }
 
-            abort_if(
-                DB::table('unbuild_order_items')->where('component_product_id', $product->id)->exists(),
-                409,
-                __('Products with stock or document lines cannot be deleted. Deactivate the product instead.'),
-            );
+            foreach (['unbuild_order_items', 'manufacturing_order_items'] as $componentTable) {
+                abort_if(
+                    DB::table($componentTable)->where('component_product_id', $product->id)->exists(),
+                    409,
+                    __('Products with stock or document lines cannot be deleted. Deactivate the product instead.'),
+                );
+            }
 
             $product->productSuppliers()->get()->each->delete();
             $product->reorderingRules()->get()->each->delete();

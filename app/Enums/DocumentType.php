@@ -19,6 +19,7 @@ enum DocumentType: string
     case MaterialRequisition = 'material_requisition';
     case ScrapOrder = 'scrap_order';
     case UnbuildOrder = 'unbuild_order';
+    case ManufacturingOrder = 'manufacturing_order';
     case JournalEntry = 'journal_entry';
     case PaymentReceipt = 'payment_receipt';
     case PaymentPayment = 'payment_payment';
@@ -41,6 +42,7 @@ enum DocumentType: string
             self::MaterialRequisition => 'MR',
             self::ScrapOrder => 'SC',
             self::UnbuildOrder => 'UB',
+            self::ManufacturingOrder => 'MO',
             self::JournalEntry => 'JE',
             self::PaymentReceipt => 'RC',
             self::PaymentPayment => 'PY',
@@ -67,6 +69,7 @@ enum DocumentType: string
             self::MaterialRequisition => ['material_requisitions', 'requisition_no'],
             self::ScrapOrder => ['scrap_orders', 'scrap_no'],
             self::UnbuildOrder => ['unbuild_orders', 'unbuild_no'],
+            self::ManufacturingOrder => ['manufacturing_orders', 'mo_no'],
             self::JournalEntry => ['journal_entries', 'entry_no'],
             self::PaymentReceipt, self::PaymentPayment => ['payments', 'payment_no'],
         };

@@ -361,6 +361,7 @@ class ProductController extends Controller
             'material_requisition' => ['material_requisitions', 'requisition_no'],
             'scrap_order' => ['scrap_orders', 'scrap_no'],
             'unbuild_order' => ['unbuild_orders', 'unbuild_no'],
+            'manufacturing_order' => ['manufacturing_orders', 'mo_no'],
         ];
         $itemDocuments = [
             'goods_receipt_item' => ['goods_receipt_items', 'goods_receipt_id', 'goods_receipt'],
@@ -372,6 +373,7 @@ class ProductController extends Controller
             'material_requisition_item' => ['material_requisition_items', 'material_requisition_id', 'material_requisition'],
             'scrap_order_item' => ['scrap_order_items', 'scrap_order_id', 'scrap_order'],
             'unbuild_order_item' => ['unbuild_order_items', 'unbuild_order_id', 'unbuild_order'],
+            'manufacturing_order_item' => ['manufacturing_order_items', 'manufacturing_order_id', 'manufacturing_order'],
         ];
 
         /** @var array<string, array<int, array{type: string, id: int, number: string}>> $documents */

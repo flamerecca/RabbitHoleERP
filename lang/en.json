@@ -62,5 +62,10 @@
     "Unbuild order": "Unbuild order",
     "Unbuild orders": "Unbuild orders",
     "Components": "Components",
-    "A bill of materials used by an unbuild order cannot be deleted.": "A bill of materials used by an unbuild order cannot be deleted."
+    "A bill of materials used by an order cannot be deleted.": "A bill of materials used by an order cannot be deleted.",
+    "status.production_consume": "Production consume",
+    "status.production_output": "Production output",
+    "status.done": "Done",
+    "record.manufacturing_order": "Manufacturing order",
+    "record.manufacturing_order_item": "Manufacturing order item"
 }

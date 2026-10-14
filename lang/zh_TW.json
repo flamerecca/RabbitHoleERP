@@ -410,5 +410,10 @@
     "Only draft unbuild orders can be cancelled.": "只有草稿狀態的拆解單可以取消。",
     "Unbuild order": "拆解單",
     "Unbuild orders": "拆解單",
-    "A bill of materials used by an unbuild order cannot be deleted.": "已被拆解單使用的物料清單不能刪除。"
+    "A bill of materials used by an order cannot be deleted.": "已被拆解單或生產單使用的物料清單不能刪除。",
+    "status.production_consume": "生產領料",
+    "status.production_output": "生產入庫",
+    "status.done": "已完成",
+    "record.manufacturing_order": "生產單",
+    "record.manufacturing_order_item": "生產單明細"
 }

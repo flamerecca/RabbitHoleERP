@@ -6,6 +6,8 @@ use App\Models\ConsignmentHold;
 use App\Models\GoodsReceipt;
 use App\Models\GoodsReceiptItem;
 use App\Models\JournalEntry;
+use App\Models\ManufacturingOrder;
+use App\Models\ManufacturingOrderItem;
 use App\Models\MaterialRequisition;
 use App\Models\MaterialRequisitionItem;
 use App\Models\ScrapOrder;
@@ -111,6 +113,8 @@ class AppServiceProvider extends ServiceProvider
             'scrap_order_item' => ScrapOrderItem::class,
             'unbuild_order' => UnbuildOrder::class,
             'unbuild_order_item' => UnbuildOrderItem::class,
+            'manufacturing_order' => ManufacturingOrder::class,
+            'manufacturing_order_item' => ManufacturingOrderItem::class,
             'journal_entry' => JournalEntry::class,
             'payment' => Payment::class,
         ]);

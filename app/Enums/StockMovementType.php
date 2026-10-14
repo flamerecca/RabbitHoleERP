@@ -19,6 +19,8 @@ enum StockMovementType: string
     case RequisitionOut = 'requisition_out';
     case UnbuildOut = 'unbuild_out';
     case UnbuildIn = 'unbuild_in';
+    case ProductionConsume = 'production_consume';
+    case ProductionOutput = 'production_output';
 
     /**
      * Get the virtual location on the other side of the movement, or null for warehouse transfers.
@@ -30,7 +32,7 @@ enum StockMovementType: string
             self::SalesOut, self::SalesReturnIn => VirtualLocation::Customers,
             self::ScrapOut => VirtualLocation::Scrap,
             self::AdjustmentIn, self::AdjustmentOut => VirtualLocation::Inventory,
-            self::RequisitionOut, self::UnbuildOut, self::UnbuildIn => VirtualLocation::Production,
+            self::RequisitionOut, self::UnbuildOut, self::UnbuildIn, self::ProductionConsume, self::ProductionOutput => VirtualLocation::Production,
             self::TransferIn, self::TransferOut => null,
         };
     }

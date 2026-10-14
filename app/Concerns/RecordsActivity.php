@@ -19,7 +19,7 @@ trait RecordsActivity
      *
      * @var list<string>
      */
-    protected static array $activityLabelAttributes = ['order_no', 'receipt_no', 'return_no', 'shipment_no', 'hold_no', 'transfer_no', 'take_no', 'requisition_no', 'scrap_no', 'unbuild_no', 'payment_no', 'sku'];
+    protected static array $activityLabelAttributes = ['order_no', 'receipt_no', 'return_no', 'shipment_no', 'hold_no', 'transfer_no', 'take_no', 'requisition_no', 'scrap_no', 'unbuild_no', 'mo_no', 'payment_no', 'sku'];
 
     /**
      * Register the model event listeners.

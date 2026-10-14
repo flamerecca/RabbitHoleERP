@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Enums\PurchaseOrderStatus;
 use App\Enums\SalesOrderStatus;
 use App\Models\GoodsReceiptItem;
+use App\Models\ManufacturingOrder;
+use App\Models\ManufacturingOrderItem;
 use App\Models\MaterialRequisitionItem;
 use App\Models\ScrapOrderItem;
 use App\Models\UnbuildOrder;
@@ -197,6 +199,8 @@ class ProductDashboard
             $reference instanceof ScrapOrderItem => $reference->scrapOrder->scrap_no,
             $reference instanceof UnbuildOrder => $reference->unbuild_no,
             $reference instanceof UnbuildOrderItem => $reference->unbuildOrder->unbuild_no,
+            $reference instanceof ManufacturingOrder => $reference->mo_no,
+            $reference instanceof ManufacturingOrderItem => $reference->manufacturingOrder->mo_no,
             $reference instanceof Model => $reference->getAttribute('receipt_no')
                 ?? $reference->getAttribute('shipment_no')
                 ?? $reference->getAttribute('return_no')
@@ -204,7 +208,8 @@ class ProductDashboard
                 ?? $reference->getAttribute('take_no')
                 ?? $reference->getAttribute('requisition_no')
                 ?? $reference->getAttribute('scrap_no')
-                ?? $reference->getAttribute('unbuild_no'),
+                ?? $reference->getAttribute('unbuild_no')
+                ?? $reference->getAttribute('mo_no'),
             default => $movement->note,
         };
 

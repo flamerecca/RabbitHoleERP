@@ -27,6 +27,7 @@ class DeleteWarehouse
         ['material_requisitions', 'warehouse_id'],
         ['scrap_orders', 'warehouse_id'],
         ['unbuild_orders', 'warehouse_id'],
+        ['manufacturing_orders', 'warehouse_id'],
         ['reordering_rules', 'warehouse_id'],
     ];
 

@@ -8,6 +8,7 @@ use App\Filament\Support\DomainAction;
 use App\Filament\Support\TeamOptions;
 use App\Models\Bom;
 use App\Models\BomItem;
+use App\Models\ManufacturingOrder;
 use App\Models\Team;
 use App\Models\UnbuildOrder;
 use BackedEnum;
@@ -139,8 +140,8 @@ class BomResource extends Resource
                     )),
                 DeleteAction::make()
                     ->before(function (DeleteAction $action, Bom $record): void {
-                        if (UnbuildOrder::query()->where('bom_id', $record->id)->exists()) {
-                            Notification::make()->danger()->title(__('A bill of materials used by an unbuild order cannot be deleted.'))->send();
+                        if (UnbuildOrder::query()->where('bom_id', $record->id)->exists() || ManufacturingOrder::query()->where('bom_id', $record->id)->exists()) {
+                            Notification::make()->danger()->title(__('A bill of materials used by an order cannot be deleted.'))->send();
                             $action->halt();
                         }
                     }),
