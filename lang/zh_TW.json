@@ -394,5 +394,7 @@
     "The quantity must be greater than zero.": "數量必須大於 0。",
     "Only draft scrap orders can be updated.": "只有草稿狀態的報廢單可以修改。",
     "Only draft scrap orders can be confirmed.": "只有草稿狀態的報廢單可以確認。",
-    "Only draft scrap orders can be cancelled.": "只有草稿狀態的報廢單可以取消。"
+    "Only draft scrap orders can be cancelled.": "只有草稿狀態的報廢單可以取消。",
+    "Scrap order": "報廢單",
+    "Scrap orders": "報廢單"
 }
