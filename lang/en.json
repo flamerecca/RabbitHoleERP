@@ -85,5 +85,7 @@
     "Products with a refurbished product cannot be deleted.": "Products with a refurbished product cannot be deleted.",
     "The product has no refurbished product.": "The product has no refurbished product.",
     "The refurbished product no longer matches the product.": "The refurbished product no longer matches the product.",
-    "A refurbished product cannot be purchased.": "A refurbished product cannot be purchased."
+    "A refurbished product cannot be purchased.": "A refurbished product cannot be purchased.",
+    "Refurbished product": "Refurbished product",
+    "A return can be turned into this product, which is sold at its own price and cannot be purchased.": "A return can be turned into this product, which is sold at its own price and cannot be purchased."
 }

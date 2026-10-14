@@ -44,6 +44,22 @@ class ProductForm
                             ->default(fn () => Product::lotTrackingRequiredFor(TeamOptions::team()->id, null) ? ProductTracking::Lot->value : ProductTracking::None->value)
                             ->required()
                             ->helperText(__('Cannot change after the product has stock movements.')),
+                        Select::make('refurbished_product_id')
+                            ->label(__('Refurbished product'))
+                            ->options(fn (?Product $record, Get $get): array => Product::query()
+                                ->where('team_id', TeamOptions::team()->id)
+                                ->whereNull('refurbished_product_id')
+                                ->whereDoesntHave('refurbishedFrom', fn ($query) => $query->when($record !== null, fn ($inner) => $inner->whereKeyNot($record->id)))
+                                ->when($record !== null, fn ($query) => $query->whereKeyNot($record->id))
+                                ->where('unit_id', $record?->unit_id ?? $get('unit_id'))
+                                ->where('tracking', $record?->tracking->value ?? $get('tracking'))
+                                ->orderBy('sku')
+                                ->get()
+                                ->mapWithKeys(fn (Product $product): array => [$product->id => "{$product->sku} {$product->name}"])
+                                ->all())
+                            ->searchable()
+                            ->nullable()
+                            ->helperText(__('A return can be turned into this product, which is sold at its own price and cannot be purchased.')),
                     ]),
                 Section::make(__('Units and prices'))
                     ->columns(2)

@@ -432,5 +432,7 @@
     "Products with a refurbished product cannot be deleted.": "有整新品關聯的產品不能刪除。",
     "The product has no refurbished product.": "此產品沒有設定整新品產品。",
     "The refurbished product no longer matches the product.": "整新品產品已與原產品不一致，請重新設定。",
-    "A refurbished product cannot be purchased.": "整新品產品不可採購。"
+    "A refurbished product cannot be purchased.": "整新品產品不可採購。",
+    "Refurbished product": "整新品產品",
+    "A return can be turned into this product, which is sold at its own price and cannot be purchased.": "退貨可以轉為這個產品，以自己的售價販售，且不可採購。"
 }
