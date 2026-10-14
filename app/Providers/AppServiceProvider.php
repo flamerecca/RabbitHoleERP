@@ -8,6 +8,8 @@ use App\Models\GoodsReceiptItem;
 use App\Models\JournalEntry;
 use App\Models\MaterialRequisition;
 use App\Models\MaterialRequisitionItem;
+use App\Models\ScrapOrder;
+use App\Models\ScrapOrderItem;
 use App\Models\Payment;
 use App\Models\Product;
 use App\Models\ProductSupplier;
@@ -103,6 +105,8 @@ class AppServiceProvider extends ServiceProvider
             'stock_take_item' => StockTakeItem::class,
             'material_requisition' => MaterialRequisition::class,
             'material_requisition_item' => MaterialRequisitionItem::class,
+            'scrap_order' => ScrapOrder::class,
+            'scrap_order_item' => ScrapOrderItem::class,
             'journal_entry' => JournalEntry::class,
             'payment' => Payment::class,
         ]);

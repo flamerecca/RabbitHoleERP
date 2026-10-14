@@ -17,6 +17,7 @@ enum DocumentType: string
     case WarehouseTransfer = 'warehouse_transfer';
     case StockTake = 'stock_take';
     case MaterialRequisition = 'material_requisition';
+    case ScrapOrder = 'scrap_order';
     case JournalEntry = 'journal_entry';
     case PaymentReceipt = 'payment_receipt';
     case PaymentPayment = 'payment_payment';
@@ -37,6 +38,7 @@ enum DocumentType: string
             self::WarehouseTransfer => 'WT',
             self::StockTake => 'ST',
             self::MaterialRequisition => 'MR',
+            self::ScrapOrder => 'SC',
             self::JournalEntry => 'JE',
             self::PaymentReceipt => 'RC',
             self::PaymentPayment => 'PY',
@@ -61,6 +63,7 @@ enum DocumentType: string
             self::WarehouseTransfer => ['warehouse_transfers', 'transfer_no'],
             self::StockTake => ['stock_takes', 'take_no'],
             self::MaterialRequisition => ['material_requisitions', 'requisition_no'],
+            self::ScrapOrder => ['scrap_orders', 'scrap_no'],
             self::JournalEntry => ['journal_entries', 'entry_no'],
             self::PaymentReceipt, self::PaymentPayment => ['payments', 'payment_no'],
         };
