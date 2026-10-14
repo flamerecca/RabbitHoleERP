@@ -434,5 +434,14 @@
     "The refurbished product no longer matches the product.": "整新品產品已與原產品不一致，請重新設定。",
     "A refurbished product cannot be purchased.": "整新品產品不可採購。",
     "Refurbished product": "整新品產品",
-    "A return can be turned into this product, which is sold at its own price and cannot be purchased.": "退貨可以轉為這個產品，以自己的售價販售，且不可採購。"
+    "A return can be turned into this product, which is sold at its own price and cannot be purchased.": "退貨可以轉為這個產品，以自己的售價販售，且不可採購。",
+    "Discounts": "折扣期間",
+    "Discount": "折扣",
+    "Discount rate": "折扣比例",
+    "Starts on": "起日",
+    "Ends on": "迄日",
+    "The discount period overlaps another active discount of the product.": "折扣期間與此商品其他啟用中的折扣重疊。",
+    "The product has no default sales price, so the unit price is required.": "商品沒有預設售價，必須填寫單價。",
+    "Leave empty to use the price of the order date, discount included.": "留空則依訂單日期自動帶入價格，含折扣。",
+    "The ends on field must be a date after or equal to starts on.": "迄日必須等於或晚於起日。"
 }

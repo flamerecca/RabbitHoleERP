@@ -380,9 +380,9 @@ class SalesOrderController extends Controller
     private function linePrices(array $lines, string $orderDate): array
     {
         $prices = [];
-        foreach ($lines as $i => $line) {
+        foreach ($lines as $line) {
             $product = Product::whereKey($line['product_id'])->firstOrFail();
-            $prices[$i] = $this->linePrice($product, $line, $orderDate, "items.$i.unit_price");
+            $prices[] = $this->linePrice($product, $line, $orderDate, 'items.'.count($prices).'.unit_price');
         }
 
         return $prices;
