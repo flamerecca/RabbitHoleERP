@@ -26,16 +26,16 @@ class ValidateScrapOrderInput
         }
 
         if (array_key_exists('items', $attributes)) {
-            $items = collect($attributes['items']);
-            $productIds = $items->pluck('product_id');
+            $lines = array_values((array) $attributes['items']);
+            $productIds = array_column($lines, 'product_id');
 
-            if ($items->isEmpty()) {
+            if ($lines === []) {
                 $errors['items'] = __('A scrap order needs at least one line.');
-            } elseif ($productIds->duplicates()->isNotEmpty()) {
+            } elseif (count($productIds) !== count(array_unique($productIds))) {
                 $errors['items'] = __('A product can appear only once on a scrap order.');
-            } elseif (Product::query()->where('team_id', $team->id)->whereKey($productIds->all())->count() !== $productIds->count()) {
+            } elseif (Product::query()->where('team_id', $team->id)->whereKey($productIds)->count() !== count($productIds)) {
                 $errors['items'] = __('The selected product is invalid.');
-            } elseif ($items->contains(fn (array $line) => (float) $line['quantity'] <= 0)) {
+            } elseif (array_filter(array_column($lines, 'quantity'), fn (mixed $quantity) => (float) $quantity <= 0) !== []) {
                 $errors['items'] = __('The quantity must be greater than zero.');
             }
         }
