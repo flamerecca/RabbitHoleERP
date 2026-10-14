@@ -49,5 +49,9 @@
     "activity.updated": "Updated",
     "activity.deleted": "Deleted",
     "record.scrap_order": "Scrap order",
-    "record.scrap_order_item": "Scrap order item"
+    "record.scrap_order_item": "Scrap order item",
+    "status.unbuild_out": "Unbuild out",
+    "status.unbuild_in": "Unbuild in",
+    "record.unbuild_order": "Unbuild order",
+    "record.unbuild_order_item": "Unbuild order item"
 }

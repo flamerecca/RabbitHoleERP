@@ -7,6 +7,8 @@ use App\Enums\SalesOrderStatus;
 use App\Models\GoodsReceiptItem;
 use App\Models\MaterialRequisitionItem;
 use App\Models\ScrapOrderItem;
+use App\Models\UnbuildOrder;
+use App\Models\UnbuildOrderItem;
 use App\Models\Product;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseReturnItem;
@@ -193,12 +195,16 @@ class ProductDashboard
             $reference instanceof StockTakeItem => $reference->stockTake->take_no,
             $reference instanceof MaterialRequisitionItem => $reference->materialRequisition->requisition_no,
             $reference instanceof ScrapOrderItem => $reference->scrapOrder->scrap_no,
+            $reference instanceof UnbuildOrder => $reference->unbuild_no,
+            $reference instanceof UnbuildOrderItem => $reference->unbuildOrder->unbuild_no,
             $reference instanceof Model => $reference->getAttribute('receipt_no')
                 ?? $reference->getAttribute('shipment_no')
                 ?? $reference->getAttribute('return_no')
                 ?? $reference->getAttribute('transfer_no')
                 ?? $reference->getAttribute('take_no')
-                ?? $reference->getAttribute('requisition_no'),
+                ?? $reference->getAttribute('requisition_no')
+                ?? $reference->getAttribute('scrap_no')
+                ?? $reference->getAttribute('unbuild_no'),
             default => $movement->note,
         };
 

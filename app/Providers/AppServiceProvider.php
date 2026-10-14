@@ -10,6 +10,8 @@ use App\Models\MaterialRequisition;
 use App\Models\MaterialRequisitionItem;
 use App\Models\ScrapOrder;
 use App\Models\ScrapOrderItem;
+use App\Models\UnbuildOrder;
+use App\Models\UnbuildOrderItem;
 use App\Models\Payment;
 use App\Models\Product;
 use App\Models\ProductSupplier;
@@ -107,6 +109,8 @@ class AppServiceProvider extends ServiceProvider
             'material_requisition_item' => MaterialRequisitionItem::class,
             'scrap_order' => ScrapOrder::class,
             'scrap_order_item' => ScrapOrderItem::class,
+            'unbuild_order' => UnbuildOrder::class,
+            'unbuild_order_item' => UnbuildOrderItem::class,
             'journal_entry' => JournalEntry::class,
             'payment' => Payment::class,
         ]);

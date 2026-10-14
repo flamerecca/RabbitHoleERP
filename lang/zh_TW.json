@@ -398,5 +398,9 @@
     "Scrap order": "報廢單",
     "Scrap orders": "報廢單",
     "record.scrap_order": "報廢單",
-    "record.scrap_order_item": "報廢單明細"
+    "record.scrap_order_item": "報廢單明細",
+    "status.unbuild_out": "拆解出庫",
+    "status.unbuild_in": "拆解入庫",
+    "record.unbuild_order": "拆解單",
+    "record.unbuild_order_item": "拆解單明細"
 }

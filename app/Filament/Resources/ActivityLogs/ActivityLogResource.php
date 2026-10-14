@@ -97,7 +97,7 @@ class ActivityLogResource extends Resource
             ->filters([
                 SelectFilter::make('c6')
                     ->label('Record')
-                    ->options(fn () => collect(['product', 'purchase_order', 'goods_receipt', 'purchase_return', 'sales_order', 'shipment', 'sales_return', 'consignment_hold', 'warehouse_transfer', 'stock_take', 'material_requisition', 'scrap_order'])->mapWithKeys(fn (string $type) => [$type => __("record.{$type}")])->all()),
+                    ->options(fn () => collect(['product', 'purchase_order', 'goods_receipt', 'purchase_return', 'sales_order', 'shipment', 'sales_return', 'consignment_hold', 'warehouse_transfer', 'stock_take', 'material_requisition', 'scrap_order', 'unbuild_order'])->mapWithKeys(fn (string $type) => [$type => __("record.{$type}")])->all()),
                 Filter::make('document')
                     ->schema([
                         Hidden::make('document_type'),
