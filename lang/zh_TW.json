@@ -383,5 +383,8 @@
     "On order": "在途",
     "Net requirement": "淨需求",
     "No requirements.": "目前沒有需求。",
-    "The active bills of materials contain a cycle. Fix them and try again.": "啟用中的物料清單含有循環，請修正後再試。"
+    "The active bills of materials contain a cycle. Fix them and try again.": "啟用中的物料清單含有循環，請修正後再試。",
+    "Scrap settings": "報廢設定",
+    "Enable scrap orders": "啟用報廢單",
+    "Turning this off hides the scrap orders. Existing scrap orders are kept. Scrap orders also need the MRP module.": "關閉後會隱藏報廢單，既有的報廢單會保留。報廢單也需要啟用 MRP 模組。"
 }

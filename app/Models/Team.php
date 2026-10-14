@@ -23,6 +23,7 @@ use Illuminate\Support\Carbon;
  * @property bool $require_lot_tracking
  * @property bool $hr_enabled
  * @property bool $mrp_enabled
+ * @property bool $scrap_enabled
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
@@ -60,7 +61,7 @@ use Illuminate\Support\Carbon;
  * @property-read Collection<int, JournalEntry> $journalEntries
  * @property-read Collection<int, Payment> $payments
  */
-#[Fillable(['name', 'slug', 'is_personal', 'require_lot_tracking', 'hr_enabled', 'mrp_enabled'])]
+#[Fillable(['name', 'slug', 'is_personal', 'require_lot_tracking', 'hr_enabled', 'mrp_enabled', 'scrap_enabled'])]
 class Team extends Model
 {
     use GeneratesUniqueTeamSlugs;
@@ -439,6 +440,7 @@ class Team extends Model
     protected $attributes = [
         'hr_enabled' => false,
         'mrp_enabled' => false,
+        'scrap_enabled' => false,
     ];
 
     /**
@@ -453,6 +455,7 @@ class Team extends Model
             'require_lot_tracking' => 'boolean',
             'hr_enabled' => 'boolean',
             'mrp_enabled' => 'boolean',
+            'scrap_enabled' => 'boolean',
         ];
     }
 
@@ -470,6 +473,14 @@ class Team extends Model
     public function isMrpEnabled(): bool
     {
         return $this->mrp_enabled;
+    }
+
+    /**
+     * Determine if scrap orders are available, which needs both the scrap flag and the MRP module.
+     */
+    public function isScrapEnabled(): bool
+    {
+        return $this->scrap_enabled && $this->isMrpEnabled();
     }
 
     /**
