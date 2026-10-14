@@ -58,5 +58,8 @@
     "The quantity is too small for the components.": "The quantity is too small for the components.",
     "Only draft unbuild orders can be updated.": "Only draft unbuild orders can be updated.",
     "Only draft unbuild orders can be confirmed.": "Only draft unbuild orders can be confirmed.",
-    "Only draft unbuild orders can be cancelled.": "Only draft unbuild orders can be cancelled."
+    "Only draft unbuild orders can be cancelled.": "Only draft unbuild orders can be cancelled.",
+    "Unbuild order": "Unbuild order",
+    "Unbuild orders": "Unbuild orders",
+    "Components": "Components"
 }
