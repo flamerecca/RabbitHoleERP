@@ -16,6 +16,10 @@ use LogicException;
 
 class CalculateRequirements
 {
+    public function __construct(protected BomComponentFactor $factor)
+    {
+    }
+
     /**
      * Calculate the net requirement of every product with open sales demand, exploding active boms level by level.
      *
@@ -63,7 +67,7 @@ class CalculateRequirements
             }
 
             foreach ($bom->items as $item) {
-                $perUnit = (float) $item->quantity * (float) $item->unit->ratio / (float) $item->component->unit->ratio / (float) $bom->quantity;
+                $perUnit = $this->factor->handle($bom, $item);
                 $gross[$item->component_product_id] = ($gross[$item->component_product_id] ?? 0.0) + $net * $perUnit;
             }
         }
