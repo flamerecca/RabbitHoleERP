@@ -129,7 +129,9 @@ class MrpPlanning extends Page implements HasTable
      */
     protected function productIdsWithActiveBom(): array
     {
-        return Bom::query()->where('team_id', TeamOptions::team()->id)->where('is_active', true)->pluck('product_id')->all();
+        return array_values(
+            Bom::query()->where('team_id', TeamOptions::team()->id)->where('is_active', true)->pluck('product_id')->map(fn ($id): int => (int) $id)->all(),
+        );
     }
 
     /**
