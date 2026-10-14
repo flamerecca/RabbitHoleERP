@@ -26,7 +26,7 @@ class ConfirmUnbuildOrder
      * Confirm a draft unbuild order: take the product out, oldest lots first, and put the components in at its cost.
      *
      * The cost of the product is split over the components by quantity times current average cost, or by quantity
-     * when no component has an average cost. The last component takes the rounding remainder, so the value is conserved.
+     * when no component has an average cost. The component with the largest weight takes the rounding remainder, so the value is conserved and no share turns negative.
      */
     public function handle(UnbuildOrder $order, User $user): UnbuildOrder
     {
@@ -35,7 +35,7 @@ class ConfirmUnbuildOrder
 
             abort_if($order->status !== DocumentStatus::Draft, 409, __('Only draft unbuild orders can be confirmed.'));
 
-            $order->load(['product', 'items.component']);
+            $order->load(['product', 'items' => fn ($query) => $query->orderBy('id'), 'items.component']);
 
             $this->ensureStockAvailable->handle(
                 $order->warehouse_id,
@@ -72,14 +72,13 @@ class ConfirmUnbuildOrder
             }
 
             $weightSum = (float) $weights->sum();
-            $allocated = 0.0;
-            $lastIndex = $order->items->count() - 1;
+            $largest = $weights->search($weights->max());
+            $shares = $weights->map(fn (float $weight) => round($totalCost * $weight / $weightSum, 4))->all();
+            $shares[$largest] = round($totalCost - (array_sum($shares) - $shares[$largest]), 4);
 
             foreach ($order->items->values() as $index => $line) {
-                $share = $index === $lastIndex
-                    ? round($totalCost - $allocated, 4)
-                    : round($totalCost * $weights[$index] / $weightSum, 4);
-                $allocated += $share;
+                $share = $shares[$index];
+                $quantity = (float) $line->quantity;
 
                 $stockLotId = $line->component->isLotTracked()
                     ? StockLot::query()->firstOrCreate([
@@ -95,9 +94,10 @@ class ConfirmUnbuildOrder
                     warehouseId: $order->warehouse_id,
                     product: $line->component,
                     type: StockMovementType::UnbuildIn,
-                    quantity: (float) $line->quantity,
+                    quantity: $quantity,
                     user: $user,
-                    unitCostInBaseCurrency: $share / (float) $line->quantity,
+                    unitCostInBaseCurrency: $share / $quantity,
+                    incomingLayers: $this->costLayers($share, $quantity),
                     stockLotId: $stockLotId,
                 );
             }
@@ -106,5 +106,27 @@ class ConfirmUnbuildOrder
 
             return $order->fresh('items');
         });
+    }
+
+    /**
+     * Split the share into cost layers whose values add up to it exactly, as layer unit costs hold four decimals.
+     *
+     * The unit cost is cut down to four decimals for all but one unit, which takes the remainder.
+     *
+     * @return list<array{quantity: float, unit_cost: float}>
+     */
+    protected function costLayers(float $share, float $quantity): array
+    {
+        if ($quantity <= 1) {
+            return [['quantity' => $quantity, 'unit_cost' => $share / $quantity]];
+        }
+
+        $unitCost = floor($share / $quantity * 10000) / 10000;
+        $remainder = round($share - round(($quantity - 1) * $unitCost, 4), 4);
+
+        return [
+            ['quantity' => round($quantity - 1, 4), 'unit_cost' => $unitCost],
+            ['quantity' => 1.0, 'unit_cost' => $remainder],
+        ];
     }
 }

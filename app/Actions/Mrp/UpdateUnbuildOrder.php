@@ -28,7 +28,10 @@ class UpdateUnbuildOrder
                 $order->update(['reason' => $attributes['reason']]);
             }
 
-            if (array_key_exists('quantity', $attributes)) {
+            $quantityChanged = array_key_exists('quantity', $attributes)
+                && round((float) $attributes['quantity'], 4) !== round((float) $order->quantity, 4);
+
+            if ($quantityChanged) {
                 $prepared = $this->prepare->handle($order->team, $order->product_id, $attributes['quantity']);
 
                 $order->update(['quantity' => $attributes['quantity'], 'bom_id' => $prepared['bom']->id]);

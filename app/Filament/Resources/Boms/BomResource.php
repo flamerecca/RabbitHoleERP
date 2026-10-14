@@ -9,6 +9,7 @@ use App\Filament\Support\TeamOptions;
 use App\Models\Bom;
 use App\Models\BomItem;
 use App\Models\Team;
+use App\Models\UnbuildOrder;
 use BackedEnum;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -17,6 +18,7 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
@@ -135,7 +137,13 @@ class BomResource extends Resource
                         fn () => app(SaveBom::class)->handle(TeamOptions::team(), $data, $record),
                         fn () => $action->halt(),
                     )),
-                DeleteAction::make(),
+                DeleteAction::make()
+                    ->before(function (DeleteAction $action, Bom $record): void {
+                        if (UnbuildOrder::query()->where('bom_id', $record->id)->exists()) {
+                            Notification::make()->danger()->title(__('A bill of materials used by an unbuild order cannot be deleted.'))->send();
+                            $action->halt();
+                        }
+                    }),
             ]);
     }
 

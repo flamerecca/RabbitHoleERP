@@ -61,5 +61,6 @@
     "Only draft unbuild orders can be cancelled.": "Only draft unbuild orders can be cancelled.",
     "Unbuild order": "Unbuild order",
     "Unbuild orders": "Unbuild orders",
-    "Components": "Components"
+    "Components": "Components",
+    "A bill of materials used by an unbuild order cannot be deleted.": "A bill of materials used by an unbuild order cannot be deleted."
 }

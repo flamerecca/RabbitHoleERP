@@ -409,5 +409,6 @@
     "Only draft unbuild orders can be confirmed.": "只有草稿狀態的拆解單可以確認。",
     "Only draft unbuild orders can be cancelled.": "只有草稿狀態的拆解單可以取消。",
     "Unbuild order": "拆解單",
-    "Unbuild orders": "拆解單"
+    "Unbuild orders": "拆解單",
+    "A bill of materials used by an unbuild order cannot be deleted.": "已被拆解單使用的物料清單不能刪除。"
 }
