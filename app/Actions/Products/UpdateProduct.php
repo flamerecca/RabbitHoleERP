@@ -61,6 +61,18 @@ class UpdateProduct
                 (int) ($attributes['purchase_unit_id'] ?? $product->purchase_unit_id),
             );
 
+            $tracking = $attributes['tracking'] ?? $product->tracking;
+
+            app(EnsureRefurbishedProduct::class)->handle(
+                $product->team_id,
+                $product,
+                array_key_exists('refurbished_product_id', $attributes)
+                    ? ($attributes['refurbished_product_id'] === null ? null : (int) $attributes['refurbished_product_id'])
+                    : $product->refurbished_product_id,
+                (int) ($attributes['unit_id'] ?? $product->unit_id),
+                $tracking instanceof ProductTracking ? $tracking : ProductTracking::from((string) $tracking),
+            );
+
             $product->update($attributes);
 
             return $product;

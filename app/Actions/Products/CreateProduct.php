@@ -25,6 +25,16 @@ class CreateProduct
 
         static::ensureUnitsShareCategory((int) $attributes['unit_id'], (int) $attributes['purchase_unit_id']);
 
+        $tracking = $attributes['tracking'] ?? ProductTracking::None;
+
+        app(EnsureRefurbishedProduct::class)->handle(
+            $team->id,
+            null,
+            isset($attributes['refurbished_product_id']) ? (int) $attributes['refurbished_product_id'] : null,
+            (int) $attributes['unit_id'],
+            $tracking instanceof ProductTracking ? $tracking : ProductTracking::from((string) $tracking),
+        );
+
         return Product::create([
             'is_active' => true,
             'tracking' => ProductTracking::None,

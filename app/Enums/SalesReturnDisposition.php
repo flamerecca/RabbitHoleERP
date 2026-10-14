@@ -9,4 +9,5 @@ enum SalesReturnDisposition: string
 {
     case Restock = 'restock';
     case Scrap = 'scrap';
+    case Refurbish = 'refurbish';
 }

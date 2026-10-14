@@ -51,6 +51,12 @@ class DeleteProduct
                 );
             }
 
+            abort_if(
+                $product->refurbished_product_id !== null || Product::query()->where('refurbished_product_id', $product->id)->exists(),
+                409,
+                __('Products with a refurbished product cannot be deleted.'),
+            );
+
             $product->productSuppliers()->get()->each->delete();
             $product->reorderingRules()->get()->each->delete();
             $product->delete();

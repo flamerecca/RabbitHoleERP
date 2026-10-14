@@ -1504,6 +1504,7 @@ class ProductController extends Controller
             'reorder_point' => ['nullable', 'numeric', 'min:0'],
             'is_active' => ['sometimes', 'boolean'],
             'tracking' => ['sometimes', Rule::enum(ProductTracking::class)],
+            'refurbished_product_id' => ['sometimes', 'nullable', 'integer', Rule::exists('products', 'id')->where('team_id', $team->id)],
         ]);
 
         return response()->json(['data' => $this->productToArray($createProduct->handle($team, $validated))], 201);
@@ -1533,6 +1534,7 @@ class ProductController extends Controller
             'reorder_point' => ['sometimes', 'nullable', 'numeric', 'min:0'],
             'is_active' => ['sometimes', 'required', 'boolean'],
             'tracking' => ['sometimes', 'required', Rule::enum(ProductTracking::class)],
+            'refurbished_product_id' => ['sometimes', 'nullable', 'integer', Rule::exists('products', 'id')->where('team_id', $team->id)],
         ]);
 
         return response()->json(['data' => $this->productToArray($updateProduct->handle($product, $validated))]);
@@ -1600,6 +1602,7 @@ class ProductController extends Controller
             'is_active' => $product->is_active,
             'tracking' => $product->tracking->value,
             'requires_lot_tracking' => $product->requiresLotTracking(),
+            'refurbished_product_id' => $product->refurbished_product_id,
             'created_at' => $product->created_at?->toJSON(),
             'updated_at' => $product->updated_at?->toJSON(),
         ];

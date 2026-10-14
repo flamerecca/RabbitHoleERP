@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 
 /**
@@ -35,12 +36,15 @@ use Illuminate\Support\Carbon;
  * @property string|null $reorder_point
  * @property bool $is_active
  * @property ProductTracking $tracking
+ * @property int|null $refurbished_product_id
+ * @property-read Product|null $refurbishedProduct
+ * @property-read Product|null $refurbishedFrom
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read Collection<int, ProductSupplier> $productSuppliers
  * @property-read Collection<int, ReorderingRule> $reorderingRules
  */
-#[Fillable(['team_id', 'category_id', 'unit_id', 'purchase_unit_id', 'sku', 'name', 'default_purchase_price', 'default_sales_price', 'reorder_point', 'is_active', 'tracking'])]
+#[Fillable(['team_id', 'category_id', 'unit_id', 'purchase_unit_id', 'sku', 'name', 'default_purchase_price', 'default_sales_price', 'reorder_point', 'is_active', 'tracking', 'refurbished_product_id'])]
 class Product extends Model implements HasActivityLog
 {
     /** @use HasFactory<ProductFactory> */
@@ -157,6 +161,26 @@ class Product extends Model implements HasActivityLog
     public function isLotTracked(): bool
     {
         return $this->tracking === ProductTracking::Lot;
+    }
+
+    /**
+     * Get the refurbished variant this product turns into after a refurbished sales return.
+     *
+     * @return BelongsTo<Product, $this>
+     */
+    public function refurbishedProduct(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'refurbished_product_id');
+    }
+
+    /**
+     * Get the product whose refurbished variant this product is.
+     *
+     * @return HasOne<Product, $this>
+     */
+    public function refurbishedFrom(): HasOne
+    {
+        return $this->hasOne(self::class, 'refurbished_product_id');
     }
 
     /**

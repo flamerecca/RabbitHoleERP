@@ -423,5 +423,11 @@
     "Manufacturing orders": "生產單",
     "Complete": "完成",
     "Create manufacturing order": "建立生產單",
-    "Manufacturing order :number created.": "已建立生產單 :number。"
+    "Manufacturing order :number created.": "已建立生產單 :number。",
+    "disposition.refurbish": "整新品",
+    "The selected refurbished product is invalid.": "所選的整新品產品無效。",
+    "A refurbished product cannot have a refurbished product of its own.": "整新品產品不可再有自己的整新品產品。",
+    "The product is already the refurbished product of another product.": "此產品已是其他產品的整新品產品。",
+    "The refurbished product needs the same stock unit and tracking.": "整新品產品需要與原產品相同的庫存單位與批號追蹤方式。",
+    "Products with a refurbished product cannot be deleted.": "有整新品關聯的產品不能刪除。"
 }

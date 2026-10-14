@@ -76,5 +76,11 @@
     "Complete": "Complete",
     "Create manufacturing order": "Create manufacturing order",
     "Manufacturing order :number created.": "Manufacturing order :number created.",
-    "Warehouse": "Warehouse"
+    "Warehouse": "Warehouse",
+    "disposition.refurbish": "Refurbished",
+    "The selected refurbished product is invalid.": "The selected refurbished product is invalid.",
+    "A refurbished product cannot have a refurbished product of its own.": "A refurbished product cannot have a refurbished product of its own.",
+    "The product is already the refurbished product of another product.": "The product is already the refurbished product of another product.",
+    "The refurbished product needs the same stock unit and tracking.": "The refurbished product needs the same stock unit and tracking.",
+    "Products with a refurbished product cannot be deleted.": "Products with a refurbished product cannot be deleted."
 }
