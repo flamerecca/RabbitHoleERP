@@ -3,12 +3,19 @@
 namespace App\Filament\Pages;
 
 use App\Actions\Mrp\CalculateRequirements;
+use App\Actions\Mrp\CreateManufacturingOrder;
 use App\Data\RequirementLine;
+use App\Filament\Support\DomainAction;
 use App\Filament\Support\TeamOptions;
+use App\Models\Bom;
 use App\Models\Product;
 use App\Models\Team;
 use BackedEnum;
+use Filament\Actions\Action;
 use Filament\Facades\Filament;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\EmbeddedTable;
@@ -83,7 +90,46 @@ class MrpPlanning extends Page implements HasTable
                 TextColumn::make('net')
                     ->label(__('Net requirement'))
                     ->numeric(maxDecimalPlaces: 4),
+            ])
+            ->recordActions([
+                Action::make('createManufacturingOrder')
+                    ->label(__('Create manufacturing order'))
+                    ->icon(Heroicon::OutlinedWrenchScrewdriver)
+                    ->visible(fn (array $record): bool => in_array($record['id'], $this->productIdsWithActiveBom(), true))
+                    ->fillForm(fn (array $record): array => ['quantity' => $record['net']])
+                    ->schema([
+                        Select::make('warehouse_id')
+                            ->label(__('Warehouse'))
+                            ->options(fn () => TeamOptions::warehouses())
+                            ->required(),
+                        TextInput::make('quantity')
+                            ->numeric()
+                            ->rules(['gt:0'])
+                            ->required(),
+                        DatePicker::make('planned_date'),
+                    ])
+                    ->action(function (array $record, array $data, Action $action): void {
+                        $order = DomainAction::run(
+                            fn () => app(CreateManufacturingOrder::class)->handle(TeamOptions::team(), TeamOptions::user(), [
+                                'warehouse_id' => $data['warehouse_id'],
+                                'product_id' => $record['id'],
+                                'quantity' => $data['quantity'],
+                                'planned_date' => $data['planned_date'] ?? null,
+                            ]),
+                            fn () => $action->halt(),
+                        );
+
+                        Notification::make()->success()->title(__('Manufacturing order :number created.', ['number' => $order->mo_no]))->send();
+                    }),
             ]);
+    }
+
+    /**
+     * @return list<int>
+     */
+    protected function productIdsWithActiveBom(): array
+    {
+        return Bom::query()->where('team_id', TeamOptions::team()->id)->where('is_active', true)->pluck('product_id')->all();
     }
 
     /**

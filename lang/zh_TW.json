@@ -421,5 +421,7 @@
     "Only draft or confirmed manufacturing orders can be cancelled.": "只有草稿或已確認的生產單可以取消。",
     "Manufacturing order": "生產單",
     "Manufacturing orders": "生產單",
-    "Complete": "完成"
+    "Complete": "完成",
+    "Create manufacturing order": "建立生產單",
+    "Manufacturing order :number created.": "已建立生產單 :number。"
 }
