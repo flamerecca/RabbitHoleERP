@@ -21,7 +21,7 @@ class SaveQuotationTemplate
             $template->fill(Arr::only($attributes, ['name', 'is_active']))->save();
 
             if (array_key_exists('items', $attributes)) {
-                $template->items()->delete();
+                $template->items()->get()->each->delete();
                 $template->items()->createMany(array_map(
                     fn (array $line) => Arr::only($line, ['product_id', 'quantity']),
                     array_values($attributes['items']),

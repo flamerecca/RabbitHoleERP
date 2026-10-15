@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Concerns\RecordsActivity;
+use App\Contracts\HasActivityLog;
 use Database\Factories\QuotationTemplateItemFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -22,10 +24,11 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $updated_at
  */
 #[Fillable(['quotation_template_id', 'product_id', 'quantity'])]
-class QuotationTemplateItem extends Model
+class QuotationTemplateItem extends Model implements HasActivityLog
 {
     /** @use HasFactory<QuotationTemplateItemFactory> */
     use HasFactory;
+    use RecordsActivity;
 
     /**
      * Get the template of the line.
@@ -45,6 +48,14 @@ class QuotationTemplateItem extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    /**
+     * Get the template the activity of the line belongs to.
+     */
+    public function activityDocument(): Model&HasActivityLog
+    {
+        return $this->quotationTemplate()->firstOrFail();
     }
 
     /**
