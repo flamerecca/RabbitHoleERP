@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Actions\Rbac\SyncSitePermissions;
+use App\Enums\SiteRole;
 use App\Enums\TeamRole;
 use App\Models\Team;
 use App\Models\User;
@@ -76,5 +78,27 @@ class UserFactory extends Factory
             'two_factor_recovery_codes' => encrypt(json_encode(['recovery-code-1'])),
             'two_factor_confirmed_at' => now(),
         ]);
+    }
+
+    /**
+     * Indicate that the user has the site admin role.
+     */
+    public function admin(): static
+    {
+        return $this->afterCreating(function (User $user) {
+            app(SyncSitePermissions::class)->handle();
+            $user->assignRole(SiteRole::Admin->value);
+        });
+    }
+
+    /**
+     * Indicate that the user has the site operator role.
+     */
+    public function operator(): static
+    {
+        return $this->afterCreating(function (User $user) {
+            app(SyncSitePermissions::class)->handle();
+            $user->assignRole(SiteRole::Operator->value);
+        });
     }
 }

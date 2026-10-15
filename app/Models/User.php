@@ -48,8 +48,9 @@ class User extends Authenticatable implements FilamentUser, HasTenants, PasskeyU
     use HasApiTokens;
     /** @use HasFactory<UserFactory> */
     use HasFactory;
-    use HasRoles;
-    use HasTeams;
+    use HasRoles, HasTeams {
+        HasTeams::teams insteadof HasRoles;
+    }
     use Notifiable;
     use PasskeyAuthenticatable;
     use TwoFactorAuthenticatable;
