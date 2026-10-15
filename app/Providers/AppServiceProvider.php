@@ -18,6 +18,8 @@ use App\Models\Payment;
 use App\Models\Product;
 use App\Models\ProductDiscount;
 use App\Models\ProductSupplier;
+use App\Models\QuotationTemplate;
+use App\Models\QuotationTemplateItem;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
 use App\Models\PurchaseReturn;
@@ -91,6 +93,8 @@ class AppServiceProvider extends ServiceProvider
             'product' => Product::class,
             'product_supplier' => ProductSupplier::class,
             'product_discount' => ProductDiscount::class,
+            'quotation_template' => QuotationTemplate::class,
+            'quotation_template_item' => QuotationTemplateItem::class,
             'reordering_rule' => ReorderingRule::class,
             'purchase_order' => PurchaseOrder::class,
             'purchase_order_item' => PurchaseOrderItem::class,
