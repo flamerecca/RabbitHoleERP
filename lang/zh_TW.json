@@ -465,5 +465,9 @@
     "Margin rate": "毛利率",
     "No data in the period.": "期間內沒有資料。",
     "Total": "合計",
-    "The report has more than :rows rows, narrow the period or the filters to download it as a PDF.": "報表超過 :rows 列，請縮小期間或篩選條件後再下載 PDF。"
+    "The report has more than :rows rows, narrow the period or the filters to download it as a PDF.": "報表超過 :rows 列，請縮小期間或篩選條件後再下載 PDF。",
+    "System administration": "系統管理",
+    "Role": "角色",
+    "Roles": "角色",
+    "Permissions count": "權限數量"
 }
