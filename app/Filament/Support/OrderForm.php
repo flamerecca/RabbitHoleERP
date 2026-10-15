@@ -19,8 +19,9 @@ class OrderForm
      * @param  Closure(): array<int, string>  $partnerOptions
      * @param  list<string>  $fulfilledFields  Read-only line quantities written back by receipts or shipments.
      * @param  (Closure(?int, ?string): ?string)|null  $priceHint  Makes the unit price optional and shows the price resolved for a product on the order date.
+     * @param  (Closure(int): list<array{product_id: int, quantity: string}>)|null  $templateItems  Adds a select that fills the lines from a quotation template.
      */
-    public static function configure(Schema $schema, string $numberAttribute, string $partnerField, string $partnerLabel, Closure $partnerOptions, array $fulfilledFields, ?Closure $priceHint = null): Schema
+    public static function configure(Schema $schema, string $numberAttribute, string $partnerField, string $partnerLabel, Closure $partnerOptions, array $fulfilledFields, ?Closure $priceHint = null, ?Closure $templateItems = null): Schema
     {
         return DocumentForm::configure($schema, $numberAttribute, [
             Select::make($partnerField)
@@ -46,6 +47,20 @@ class OrderForm
                 ->default(1)
                 ->required(),
         ], [
+            ...($templateItems === null ? [] : [
+                Select::make('quotation_template_id')
+                    ->label(__('Apply template'))
+                    ->options(fn () => TeamOptions::quotationTemplates())
+                    ->searchable()
+                    ->live()
+                    ->dehydrated(false)
+                    ->hiddenOn('edit')
+                    ->afterStateUpdated(function (?int $state, Set $set) use ($templateItems): void {
+                        if ($state !== null) {
+                            $set('items', $templateItems($state));
+                        }
+                    }),
+            ]),
             Repeater::make('items')
                 ->label(__('Lines'))
                 ->addActionLabel(__('Add line'))

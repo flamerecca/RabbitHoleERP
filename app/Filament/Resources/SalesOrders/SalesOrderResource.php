@@ -11,6 +11,8 @@ use App\Filament\Support\DocumentColumns;
 use App\Filament\Support\OrderForm;
 use App\Filament\Support\TeamOptions;
 use App\Models\Product;
+use App\Models\QuotationTemplate;
+use App\Models\QuotationTemplateItem;
 use App\Models\SalesOrder;
 use BackedEnum;
 use Filament\Actions\EditAction;
@@ -52,7 +54,12 @@ class SalesOrderResource extends Resource
         return OrderForm::configure($schema, 'order_no', 'customer_id', 'Customer', fn () => TeamOptions::customers(), ['shipped_quantity', 'reserved_quantity'], fn (?int $productId, ?string $orderDate): ?string => $productId === null ? null : app(ResolveSalesPrice::class)->handle(
             Product::query()->where('team_id', Filament::getTenant()?->getKey())->findOrFail($productId),
             $orderDate ?? now()->toDateString(),
-        )['unit_price']);
+        )['unit_price'], fn (int $templateId): array => QuotationTemplate::query()
+            ->where('team_id', Filament::getTenant()?->getKey())
+            ->findOrFail($templateId)
+            ->items
+            ->map(fn (QuotationTemplateItem $item) => ['product_id' => $item->product_id, 'quantity' => $item->quantity])
+            ->all());
     }
 
     public static function table(Table $table): Table
