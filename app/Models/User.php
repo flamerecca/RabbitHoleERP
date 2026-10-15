@@ -21,6 +21,7 @@ use Laravel\Fortify\Contracts\PasskeyUser;
 use Laravel\Fortify\PasskeyAuthenticatable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 /**
  * @property int $id
@@ -47,6 +48,7 @@ class User extends Authenticatable implements FilamentUser, HasTenants, PasskeyU
     use HasApiTokens;
     /** @use HasFactory<UserFactory> */
     use HasFactory;
+    use HasRoles;
     use HasTeams;
     use Notifiable;
     use PasskeyAuthenticatable;
