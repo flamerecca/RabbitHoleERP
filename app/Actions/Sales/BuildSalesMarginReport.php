@@ -14,6 +14,7 @@ use App\Models\StockMovement;
 use App\Models\Team;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Validation\ValidationException;
 use InvalidArgumentException;
 
@@ -30,6 +31,11 @@ class BuildSalesMarginReport
      * The most days a report period may cover, both ends included.
      */
     public const MAX_DAYS = 366;
+
+    /**
+     * How many documents are loaded at a time, which also keeps every movement lookup far below the bind parameter limit.
+     */
+    public int $chunkSize = 500;
 
     /**
      * Net the confirmed shipments of the period against their confirmed returns, grouped by one dimension.
@@ -54,59 +60,61 @@ class BuildSalesMarginReport
                 ->when($filters['customer_id'] ?? null, fn (Builder $query, int $id) => $query->whereHas('salesOrder', fn (Builder $order) => $order->where('customer_id', $id)));
         };
         $productId = $filters['product_id'] ?? null;
-
-        $shipments = Shipment::query()
-            ->where($shipmentScope)
-            ->with(['salesOrder.customer', 'items.product', 'items.salesOrderItem'])
-            ->get();
-        $returns = SalesReturn::query()
-            ->where('team_id', $team->id)
-            ->where('status', DocumentStatus::Confirmed)
-            ->whereHas('shipment', $shipmentScope)
-            ->with(['items.product', 'shipment.salesOrder.customer', 'shipment.items.product.unit', 'shipment.items.salesOrderItem.unit'])
-            ->get();
-
-        $shipmentItems = $shipments->flatMap->items;
-        $returnItems = $returns->flatMap->items;
-        $shippedCosts = $this->movementCosts(StockMovementType::SalesOut, (new ShipmentItem())->getMorphClass(), $shipmentItems->pluck('id')->all());
-        $returnedCosts = $this->movementCosts(
-            StockMovementType::SalesReturnIn,
-            (new SalesReturnItem())->getMorphClass(),
-            $returnItems->filter(fn (SalesReturnItem $item) => $this->restocks($item))->pluck('id')->all(),
-        );
+        $shippedType = (new ShipmentItem())->getMorphClass();
+        $returnedType = (new SalesReturnItem())->getMorphClass();
 
         /** @var array<string, array{label: string, shipped_revenue: float, returned_revenue: float, shipped_cost: float, returned_cost: float}> $groups */
         $groups = [];
 
-        foreach ($shipments as $shipment) {
-            $order = $shipment->salesOrder;
+        Shipment::query()
+            ->where($shipmentScope)
+            ->with(['salesOrder.customer', 'items.product', 'items.salesOrderItem'])
+            ->chunkById($this->chunkSize, function (EloquentCollection $shipments) use (&$groups, $groupBy, $productId, $shippedType): void {
+                $costs = $this->movementCosts(StockMovementType::SalesOut, $shippedType, $shipments->flatMap->items->pluck('id')->all());
 
-            foreach ($shipment->items as $item) {
-                if ($productId !== null && $item->product_id !== $productId) {
-                    continue;
+                foreach ($shipments as $shipment) {
+                    $order = $shipment->salesOrder;
+
+                    foreach ($shipment->items as $item) {
+                        if ($productId !== null && $item->product_id !== $productId) {
+                            continue;
+                        }
+
+                        [$key, $label] = $this->group($groupBy, $shipment, $item->product);
+                        $groups[$key] ??= $this->emptyGroup($label);
+                        $groups[$key]['shipped_revenue'] += (float) $item->quantity * (float) $item->salesOrderItem->unit_price * (float) $order->exchange_rate;
+                        $groups[$key]['shipped_cost'] += $costs[$item->id] ?? 0.0;
+                    }
                 }
+            });
 
-                [$key, $label] = $this->group($groupBy, $shipment, $item->product);
-                $groups[$key] ??= $this->emptyGroup($label);
-                $groups[$key]['shipped_revenue'] += (float) $item->quantity * (float) $item->salesOrderItem->unit_price * (float) $order->exchange_rate;
-                $groups[$key]['shipped_cost'] += $shippedCosts[$item->id] ?? 0.0;
-            }
-        }
+        SalesReturn::query()
+            ->where('team_id', $team->id)
+            ->where('status', DocumentStatus::Confirmed)
+            ->whereHas('shipment', $shipmentScope)
+            ->with(['items.product', 'shipment.salesOrder.customer', 'shipment.items.product.unit', 'shipment.items.salesOrderItem.unit'])
+            ->chunkById($this->chunkSize, function (EloquentCollection $returns) use (&$groups, $groupBy, $productId, $returnedType): void {
+                $costs = $this->movementCosts(
+                    StockMovementType::SalesReturnIn,
+                    $returnedType,
+                    $returns->flatMap->items->filter(fn (SalesReturnItem $item) => $this->restocks($item))->pluck('id')->all(),
+                );
 
-        foreach ($returns as $salesReturn) {
-            $shipment = $salesReturn->shipment;
+                foreach ($returns as $salesReturn) {
+                    $shipment = $salesReturn->shipment;
 
-            foreach ($salesReturn->items as $item) {
-                if ($productId !== null && $item->product_id !== $productId) {
-                    continue;
+                    foreach ($salesReturn->items as $item) {
+                        if ($productId !== null && $item->product_id !== $productId) {
+                            continue;
+                        }
+
+                        [$key, $label] = $this->group($groupBy, $shipment, $item->product);
+                        $groups[$key] ??= $this->emptyGroup($label);
+                        $groups[$key]['returned_revenue'] += (float) $item->quantity * $this->shippedUnitPrice($shipment, $item->product_id) * (float) $shipment->salesOrder->exchange_rate;
+                        $groups[$key]['returned_cost'] += $this->restocks($item) ? ($costs[$item->id] ?? 0.0) : 0.0;
+                    }
                 }
-
-                [$key, $label] = $this->group($groupBy, $shipment, $item->product);
-                $groups[$key] ??= $this->emptyGroup($label);
-                $groups[$key]['returned_revenue'] += (float) $item->quantity * $this->shippedUnitPrice($shipment, $item->product_id) * (float) $shipment->salesOrder->exchange_rate;
-                $groups[$key]['returned_cost'] += $this->restocks($item) ? ($returnedCosts[$item->id] ?? 0.0) : 0.0;
-            }
-        }
+            });
 
         ksort($groups, SORT_STRING);
 

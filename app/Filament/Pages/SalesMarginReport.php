@@ -181,7 +181,14 @@ class SalesMarginReport extends Page implements HasTable
         }
 
         $render = app(RenderSalesMarginReportPdf::class);
-        $pdf = $render->handle(TeamOptions::team(), $report['criteria'], ['rows' => array_values($report['rows']), 'totals' => $report['totals']]);
+
+        try {
+            $pdf = $render->handle(TeamOptions::team(), $report['criteria'], ['rows' => array_values($report['rows']), 'totals' => $report['totals']]);
+        } catch (ValidationException $exception) {
+            Notification::make()->danger()->title((string) collect($exception->errors())->flatten()->first())->send();
+
+            return null;
+        }
 
         return response()->streamDownload(fn () => print($pdf), $render->filename($report['criteria']), ['Content-Type' => 'application/pdf']);
     }
