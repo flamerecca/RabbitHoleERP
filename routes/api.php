@@ -22,6 +22,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\PurchaseReturnController;
 use App\Http\Controllers\QuotationTemplateController;
+use App\Http\Controllers\SalesMarginReportController;
 use App\Http\Controllers\SalesOrderController;
 use App\Http\Controllers\SalesReturnController;
 use App\Http\Controllers\ShipmentController;
@@ -147,6 +148,7 @@ Route::prefix('v1/{team}')
         Route::get('payments/{payment}/allocations', [PaymentController::class, 'allocations'])->name('payments.allocations.index');
         Route::post('payments/{payment}/allocations', [PaymentController::class, 'allocate'])->name('payments.allocations.store');
         Route::get('reports/aging', AgingReportController::class)->name('reports.aging');
+        Route::get('reports/sales-margin', [SalesMarginReportController::class, 'show'])->name('reports.sales-margin');
 
         Route::get('stock-balances', [StockController::class, 'balances'])->name('stock-balances.index');
         Route::get('stock-balances/{stockBalance}', [StockController::class, 'balance'])->name('stock-balances.show');
