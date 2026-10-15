@@ -12,6 +12,7 @@ use App\Models\GoodsReceipt;
 use App\Models\Product;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
+use App\Models\QuotationTemplate;
 use App\Models\SalesOrder;
 use App\Models\SalesOrderItem;
 use App\Models\Shipment;
@@ -69,6 +70,16 @@ class TeamOptions
     {
         return Customer::query()->where('team_id', static::team()->id)->orderBy('code')->get()
             ->mapWithKeys(fn (Customer $customer) => [$customer->id => "{$customer->code} {$customer->name}"])->all();
+    }
+
+    /**
+     * Active quotation templates, offered when creating a sales order.
+     *
+     * @return array<int, string>
+     */
+    public static function quotationTemplates(): array
+    {
+        return QuotationTemplate::query()->where('team_id', static::team()->id)->where('is_active', true)->orderBy('name')->pluck('name', 'id')->all();
     }
 
     /**
