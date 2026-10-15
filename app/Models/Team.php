@@ -38,6 +38,7 @@ use Illuminate\Support\Carbon;
  * @property-read Collection<int, Customer> $customers
  * @property-read Collection<int, Currency> $currencies
  * @property-read Collection<int, TaxRate> $taxRates
+ * @property-read Collection<int, QuotationTemplate> $quotationTemplates
  * @property-read Collection<int, PurchaseReturn> $purchaseReturns
  * @property-read Collection<int, SalesReturn> $salesReturns
  * @property-read Collection<int, ConsignmentHold> $consignmentHolds
@@ -240,6 +241,16 @@ class Team extends Model
     public function taxRates(): HasMany
     {
         return $this->hasMany(TaxRate::class);
+    }
+
+    /**
+     * Get all quotation templates of this team.
+     *
+     * @return HasMany<QuotationTemplate, $this>
+     */
+    public function quotationTemplates(): HasMany
+    {
+        return $this->hasMany(QuotationTemplate::class);
     }
 
     /**
