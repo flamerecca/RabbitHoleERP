@@ -26,20 +26,139 @@ enum TeamRole: string
         return match ($this) {
             self::Owner => TeamPermission::cases(),
             self::Admin => [
+                ...TeamPermission::erp(),
                 TeamPermission::UpdateTeam,
                 TeamPermission::CreateInvitation,
                 TeamPermission::CancelInvitation,
             ],
-            self::Member => [],
+            self::Member => self::memberPermissions(),
         };
     }
 
     /**
-     * Determine if the role has the given permission.
+     * Get the permissions for this role under the given profile.
+     *
+     * The legacy profile keeps what a member could do in version one, which was everything except a few settings
+     * and accounting maintenance routes that were limited to admins.
+     *
+     * @return array<TeamPermission>
      */
-    public function hasPermission(TeamPermission $permission): bool
+    public function permissionsFor(PermissionProfile $profile): array
     {
-        return in_array($permission, $this->permissions());
+        if ($profile === PermissionProfile::Current || $this !== self::Member) {
+            return $this->permissions();
+        }
+
+        $adminOnly = self::legacyAdminOnlyPermissions();
+
+        return array_values(array_filter(TeamPermission::erp(), fn (TeamPermission $permission) => ! in_array($permission, $adminOnly, true)));
+    }
+
+    /**
+     * Determine if the role has the given permission under the given profile.
+     */
+    public function hasPermission(TeamPermission $permission, PermissionProfile $profile = PermissionProfile::Current): bool
+    {
+        return in_array($permission, $this->permissionsFor($profile), true);
+    }
+
+    /**
+     * Get the ERP permissions of a member, the ones marked M in docs/architecture/permissions.md.
+     *
+     * @return list<TeamPermission>
+     */
+    protected static function memberPermissions(): array
+    {
+        return [
+            TeamPermission::ViewProduct,
+            TeamPermission::ViewProductCategory,
+            TeamPermission::ViewUnitCategory,
+            TeamPermission::ViewUnit,
+            TeamPermission::ViewWarehouse,
+            TeamPermission::ViewSupplier,
+            TeamPermission::ViewCustomer,
+            TeamPermission::ViewCurrency,
+            TeamPermission::ViewTaxRate,
+            TeamPermission::ViewProductSupplier,
+            TeamPermission::ViewProductDiscount,
+            TeamPermission::ViewPurchaseOrder,
+            TeamPermission::CreatePurchaseOrder,
+            TeamPermission::UpdatePurchaseOrder,
+            TeamPermission::ViewGoodsReceipt,
+            TeamPermission::CreateGoodsReceipt,
+            TeamPermission::UpdateGoodsReceipt,
+            TeamPermission::ConfirmGoodsReceipt,
+            TeamPermission::ViewPurchaseReturn,
+            TeamPermission::CreatePurchaseReturn,
+            TeamPermission::UpdatePurchaseReturn,
+            TeamPermission::ViewSalesOrder,
+            TeamPermission::CreateSalesOrder,
+            TeamPermission::UpdateSalesOrder,
+            TeamPermission::ReserveSalesOrder,
+            TeamPermission::ViewShipment,
+            TeamPermission::CreateShipment,
+            TeamPermission::UpdateShipment,
+            TeamPermission::ConfirmShipment,
+            TeamPermission::ViewSalesReturn,
+            TeamPermission::CreateSalesReturn,
+            TeamPermission::UpdateSalesReturn,
+            TeamPermission::ViewConsignmentHold,
+            TeamPermission::CreateConsignmentHold,
+            TeamPermission::PickupConsignmentHold,
+            TeamPermission::ViewQuotationTemplate,
+            TeamPermission::ViewStockBalance,
+            TeamPermission::ViewStockMovement,
+            TeamPermission::ViewStockLot,
+            TeamPermission::ViewMaterialRequisition,
+            TeamPermission::CreateMaterialRequisition,
+            TeamPermission::UpdateMaterialRequisition,
+            TeamPermission::ConfirmMaterialRequisition,
+            TeamPermission::ViewWarehouseTransfer,
+            TeamPermission::CreateWarehouseTransfer,
+            TeamPermission::UpdateWarehouseTransfer,
+            TeamPermission::ConfirmWarehouseTransfer,
+            TeamPermission::ViewStockTake,
+            TeamPermission::CreateStockTake,
+            TeamPermission::UpdateStockTake,
+            TeamPermission::ViewReorderingRule,
+            TeamPermission::ViewInventorySetting,
+            TeamPermission::ViewBom,
+            TeamPermission::ViewMrpPlanning,
+            TeamPermission::ViewManufacturingOrder,
+            TeamPermission::ViewScrapOrder,
+            TeamPermission::CreateScrapOrder,
+            TeamPermission::UpdateScrapOrder,
+            TeamPermission::ViewUnbuildOrder,
+            TeamPermission::CreateUnbuildOrder,
+            TeamPermission::UpdateUnbuildOrder,
+        ];
+    }
+
+    /**
+     * Get the permissions of the operations version one limited to admins with a route level role check.
+     *
+     * @return list<TeamPermission>
+     */
+    protected static function legacyAdminOnlyPermissions(): array
+    {
+        return [
+            TeamPermission::UpdateInventorySetting,
+            TeamPermission::ViewActivityLog,
+            TeamPermission::ViewDocumentSequence,
+            TeamPermission::UpdateDocumentSequence,
+            TeamPermission::ViewDocumentRule,
+            TeamPermission::CreateDocumentRule,
+            TeamPermission::UpdateDocumentRule,
+            TeamPermission::DeleteDocumentRule,
+            TeamPermission::UpdateAccountingSetting,
+            TeamPermission::CreateInventoryClosing,
+            TeamPermission::CreateChartOfAccount,
+            TeamPermission::UpdateChartOfAccount,
+            TeamPermission::DeleteChartOfAccount,
+            TeamPermission::CreateJournal,
+            TeamPermission::UpdateJournal,
+            TeamPermission::DeleteJournal,
+        ];
     }
 
     /**
