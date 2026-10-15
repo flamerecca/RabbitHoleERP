@@ -15,6 +15,7 @@ use App\Models\Team;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Validation\ValidationException;
+use InvalidArgumentException;
 
 class BuildSalesMarginReport
 {
@@ -161,6 +162,7 @@ class BuildSalesMarginReport
             'customer' => [(string) $order->customer_id, "{$order->customer->code} {$order->customer->name}"],
             'sales_order' => [(string) $order->id, $order->order_no],
             'month' => [$shipment->shipped_date->format('Y-m'), $shipment->shipped_date->format('Y-m')],
+            default => throw new InvalidArgumentException("Unknown report grouping [{$groupBy}]."),
         };
     }
 
@@ -204,7 +206,7 @@ class BuildSalesMarginReport
     /**
      * Sum the absolute movement cost per referenced line.
      *
-     * @param  list<int|string>  $ids
+     * @param  array<int, int|string>  $ids
      * @return array<int, float>
      */
     protected function movementCosts(StockMovementType $type, string $morphClass, array $ids): array
