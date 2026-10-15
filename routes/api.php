@@ -149,6 +149,7 @@ Route::prefix('v1/{team}')
         Route::post('payments/{payment}/allocations', [PaymentController::class, 'allocate'])->name('payments.allocations.store');
         Route::get('reports/aging', AgingReportController::class)->name('reports.aging');
         Route::get('reports/sales-margin', [SalesMarginReportController::class, 'show'])->name('reports.sales-margin');
+        Route::get('reports/sales-margin/pdf', [SalesMarginReportController::class, 'pdf'])->name('reports.sales-margin.pdf');
 
         Route::get('stock-balances', [StockController::class, 'balances'])->name('stock-balances.index');
         Route::get('stock-balances/{stockBalance}', [StockController::class, 'balance'])->name('stock-balances.show');
