@@ -19,7 +19,7 @@ class OrderForm
      * @param  Closure(): array<int, string>  $partnerOptions
      * @param  list<string>  $fulfilledFields  Read-only line quantities written back by receipts or shipments.
      * @param  (Closure(?int, ?string): ?string)|null  $priceHint  Makes the unit price optional and shows the price resolved for a product on the order date.
-     * @param  (Closure(int): list<array{product_id: int, quantity: string}>)|null  $templateItems  Adds a select that fills the lines from a quotation template.
+     * @param  (Closure(int): array<int, array{product_id: int, quantity: string}>)|null  $templateItems  Adds a select that fills the lines from a quotation template.
      */
     public static function configure(Schema $schema, string $numberAttribute, string $partnerField, string $partnerLabel, Closure $partnerOptions, array $fulfilledFields, ?Closure $priceHint = null, ?Closure $templateItems = null): Schema
     {

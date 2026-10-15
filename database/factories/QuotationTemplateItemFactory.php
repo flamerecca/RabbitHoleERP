@@ -22,7 +22,7 @@ class QuotationTemplateItemFactory extends Factory
         return [
             'quotation_template_id' => QuotationTemplate::factory(),
             'product_id' => fn (array $attributes) => Product::factory()->create([
-                'team_id' => QuotationTemplate::query()->findOrFail($attributes['quotation_template_id'])->team_id,
+                'team_id' => QuotationTemplate::query()->whereKey($attributes['quotation_template_id'])->value('team_id'),
             ])->id,
             'quantity' => 1,
         ];
