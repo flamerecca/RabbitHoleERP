@@ -36,6 +36,7 @@ use App\Models\StockTakeItem;
 use App\Models\WarehouseTransfer;
 use App\Models\WarehouseTransferItem;
 use App\Services\NativeCosting;
+use App\Support\Rbac\SiteResourceAuthorizer;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Foundation\DevCommands;
@@ -44,6 +45,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
@@ -66,6 +68,15 @@ class AppServiceProvider extends ServiceProvider
         $this->configureMorphMap();
         $this->configurePaginatedResources();
         $this->configureDevServer();
+        $this->configureSiteAuthorization();
+    }
+
+    /**
+     * Decide the admin panel resource abilities by the site permissions of the user.
+     */
+    protected function configureSiteAuthorization(): void
+    {
+        Gate::before(app(SiteResourceAuthorizer::class));
     }
 
     /**
