@@ -3,9 +3,13 @@
 namespace App\Filament\Support;
 
 use App\Data\DocumentResult;
+use App\Enums\TeamPermission;
+use App\Models\Team;
+use App\Support\Rbac\DocumentPermissions;
 use BackedEnum;
 use Closure;
 use Filament\Actions\Action;
+use Filament\Facades\Filament;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\Page;
 use Illuminate\Database\Eloquent\Model;
@@ -24,12 +28,17 @@ class DocumentActions
      */
     public static function transition(string $name, string $label, string $recordClass, array $statuses, Closure $handle, string $color = 'primary', string $page = 'edit'): Action
     {
+        $permission = DocumentPermissions::for($recordClass, $name);
+
         return Action::make($name)
             ->label(__($label))
             ->color($color)
             ->requiresConfirmation()
-            ->visible(fn (Model $record): bool => in_array($record->getAttribute('status'), $statuses, true))
-            ->action(function (Model $record, Action $action, Page $livewire) use ($recordClass, $handle, $label, $page): void {
+            ->visible(fn (Model $record): bool => static::allowed($permission)
+                && in_array($record->getAttribute('status'), $statuses, true))
+            ->action(function (Model $record, Action $action, Page $livewire) use ($permission, $recordClass, $handle, $label, $page): void {
+                abort_unless(static::allowed($permission), 403, __('Your team role does not allow this action.'));
+
                 if (! $record instanceof $recordClass) {
                     throw new LogicException("The record must be a {$recordClass}.");
                 }
@@ -40,5 +49,15 @@ class DocumentActions
 
                 $livewire->redirect($livewire::getResource()::getUrl($page, ['record' => $record]));
             });
+    }
+
+    /**
+     * Determine if the signed in user has the team permission in the current team.
+     */
+    protected static function allowed(TeamPermission $permission): bool
+    {
+        $team = Filament::getTenant();
+
+        return $team instanceof Team && (auth()->user()?->hasTeamPermission($team, $permission) ?? false);
     }
 }
