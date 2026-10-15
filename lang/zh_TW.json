@@ -469,5 +469,8 @@
     "System administration": "系統管理",
     "Role": "角色",
     "Roles": "角色",
-    "Permissions count": "權限數量"
+    "Permissions count": "權限數量",
+    "User roles": "帳號角色",
+    "Some roles do not exist.": "部分角色不存在。",
+    "At least one admin is required.": "至少需要保留一位管理員。"
 }
