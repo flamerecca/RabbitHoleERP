@@ -21,6 +21,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\PurchaseReturnController;
+use App\Http\Controllers\QuotationTemplateController;
 use App\Http\Controllers\SalesOrderController;
 use App\Http\Controllers\SalesReturnController;
 use App\Http\Controllers\ShipmentController;
@@ -89,6 +90,7 @@ Route::prefix('v1/{team}')
         Route::apiResource('customers', CustomerController::class);
         Route::apiResource('currencies', CurrencyController::class);
         Route::apiResource('tax-rates', TaxRateController::class)->parameters(['tax-rates' => 'taxRate']);
+        Route::apiResource('quotation-templates', QuotationTemplateController::class)->parameters(['quotation-templates' => 'quotationTemplate']);
 
         Route::apiResource('purchase-orders', PurchaseOrderController::class)->except('destroy')->parameters(['purchase-orders' => 'purchaseOrder']);
         Route::post('purchase-orders/{purchaseOrder}/items', [PurchaseOrderController::class, 'addItem'])->name('purchase-orders.items.store');
