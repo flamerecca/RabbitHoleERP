@@ -72,6 +72,9 @@ enum TeamRole: string
         return [
             TeamPermission::ViewPosConfig,
             TeamPermission::ViewPosPaymentMethod,
+            TeamPermission::ViewPosSession,
+            TeamPermission::OpenPosSession,
+            TeamPermission::ClosePosSession,
             TeamPermission::ViewProduct,
             TeamPermission::ViewProductCategory,
             TeamPermission::ViewUnitCategory,

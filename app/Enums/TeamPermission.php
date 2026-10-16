@@ -235,6 +235,11 @@ enum TeamPermission: string
     case UpdatePosPaymentMethod = 'pos_payment_method:update';
     case DeletePosPaymentMethod = 'pos_payment_method:delete';
 
+    case ViewPosSession = 'pos_session:view';
+    case OpenPosSession = 'pos_session:open';
+    case ClosePosSession = 'pos_session:close';
+    case CloseAnyPosSession = 'pos_session:close_any';
+
     /**
      * Get the resource part of the permission value.
      */
