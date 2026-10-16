@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
@@ -24,11 +25,12 @@ use Illuminate\Support\Carbon;
  * @property-read Journal $salesJournal
  * @property string|null $receipt_header
  * @property string|null $receipt_footer
+ * @property bool $cash_control
  * @property bool $is_active
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['team_id', 'code', 'name', 'warehouse_id', 'sales_journal_id', 'receipt_header', 'receipt_footer', 'is_active'])]
+#[Fillable(['team_id', 'code', 'name', 'warehouse_id', 'sales_journal_id', 'receipt_header', 'receipt_footer', 'cash_control', 'is_active'])]
 class PosConfig extends Model
 {
     /** @use HasFactory<PosConfigFactory> */
@@ -40,6 +42,7 @@ class PosConfig extends Model
      * @var array<string, mixed>
      */
     protected $attributes = [
+        'cash_control' => true,
         'is_active' => true,
     ];
 
@@ -84,6 +87,16 @@ class PosConfig extends Model
     }
 
     /**
+     * Get the sessions of the config.
+     *
+     * @return HasMany<PosSession, $this>
+     */
+    public function sessions(): HasMany
+    {
+        return $this->hasMany(PosSession::class);
+    }
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
@@ -91,6 +104,7 @@ class PosConfig extends Model
     protected function casts(): array
     {
         return [
+            'cash_control' => 'boolean',
             'is_active' => 'boolean',
         ];
     }

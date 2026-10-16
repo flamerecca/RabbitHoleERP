@@ -29,6 +29,7 @@ class PosConfigFactory extends Factory
             'sales_journal_id' => fn (array $attributes) => Journal::factory()->create(['team_id' => $attributes['team_id'], 'type' => JournalType::Sales, 'default_account_id' => null])->id,
             'receipt_header' => null,
             'receipt_footer' => null,
+            'cash_control' => true,
             'is_active' => true,
         ];
     }

@@ -23,6 +23,7 @@ enum DocumentType: string
     case JournalEntry = 'journal_entry';
     case PaymentReceipt = 'payment_receipt';
     case PaymentPayment = 'payment_payment';
+    case PosSession = 'pos_session';
 
     /**
      * Get the default document number prefix.
@@ -46,6 +47,7 @@ enum DocumentType: string
             self::JournalEntry => 'JE',
             self::PaymentReceipt => 'RC',
             self::PaymentPayment => 'PY',
+            self::PosSession => 'PS',
         };
     }
 
@@ -72,6 +74,7 @@ enum DocumentType: string
             self::ManufacturingOrder => ['manufacturing_orders', 'mo_no'],
             self::JournalEntry => ['journal_entries', 'entry_no'],
             self::PaymentReceipt, self::PaymentPayment => ['payments', 'payment_no'],
+            self::PosSession => ['pos_sessions', 'session_no'],
         };
     }
 
