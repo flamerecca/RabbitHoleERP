@@ -56,6 +56,8 @@ class SaveJournal
     {
         return JournalEntry::query()->where('journal_id', $journal->id)->exists()
             || Payment::query()->where('journal_id', $journal->id)->exists()
+            || DB::table('pos_configs')->where('sales_journal_id', $journal->id)->exists()
+            || DB::table('pos_payment_methods')->where('journal_id', $journal->id)->exists()
             || AccountingSetting::query()
                 ->where(function ($query) use ($journal) {
                     foreach (AccountingSetting::JOURNAL_COLUMNS as $column) {
