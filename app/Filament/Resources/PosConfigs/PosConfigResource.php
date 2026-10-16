@@ -107,6 +107,10 @@ class PosConfigResource extends Resource
                 Textarea::make('receipt_footer')
                     ->label(__('Receipt footer'))
                     ->maxLength(1000),
+                Toggle::make('cash_control')
+                    ->label(__('Cash control'))
+                    ->helperText(__('Count the cash when a session opens and closes.'))
+                    ->default(true),
                 Toggle::make('is_active')
                     ->default(true),
             ]);

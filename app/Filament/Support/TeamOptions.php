@@ -12,6 +12,7 @@ use App\Models\Currency;
 use App\Models\Customer;
 use App\Models\GoodsReceipt;
 use App\Models\Journal;
+use App\Models\PosConfig;
 use App\Models\PosPaymentMethod;
 use App\Models\Product;
 use App\Models\PurchaseOrder;
@@ -86,6 +87,22 @@ class TeamOptions
             ->where('is_active', true)
             ->orderBy('name')
             ->pluck('name', 'id')
+            ->all();
+    }
+
+    /**
+     * Get the active POS stores of the current team.
+     *
+     * @return array<int, string>
+     */
+    public static function activePosConfigs(): array
+    {
+        return PosConfig::query()
+            ->where('team_id', static::team()->id)
+            ->where('is_active', true)
+            ->orderBy('code')
+            ->get()
+            ->mapWithKeys(fn (PosConfig $config) => [$config->id => "{$config->code} {$config->name}"])
             ->all();
     }
 
