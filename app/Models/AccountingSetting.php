@@ -20,6 +20,7 @@ use Illuminate\Support\Carbon;
  * @property int $cost_of_goods_sold_account_id
  * @property int $research_expense_account_id
  * @property int $inventory_adjustment_account_id
+ * @property int|null $output_tax_account_id
  * @property int $sales_journal_id
  * @property int $purchase_journal_id
  * @property int $general_journal_id
@@ -28,7 +29,7 @@ use Illuminate\Support\Carbon;
  */
 #[Fillable([
     'team_id', 'inventory_account_id', 'receivable_account_id', 'payable_account_id', 'sales_revenue_account_id',
-    'cost_of_goods_sold_account_id', 'research_expense_account_id', 'inventory_adjustment_account_id',
+    'cost_of_goods_sold_account_id', 'research_expense_account_id', 'inventory_adjustment_account_id', 'output_tax_account_id',
     'sales_journal_id', 'purchase_journal_id', 'general_journal_id',
 ])]
 class AccountingSetting extends Model
@@ -40,7 +41,7 @@ class AccountingSetting extends Model
      */
     public const ACCOUNT_COLUMNS = [
         'inventory_account_id', 'receivable_account_id', 'payable_account_id', 'sales_revenue_account_id',
-        'cost_of_goods_sold_account_id', 'research_expense_account_id', 'inventory_adjustment_account_id',
+        'cost_of_goods_sold_account_id', 'research_expense_account_id', 'inventory_adjustment_account_id', 'output_tax_account_id',
     ];
 
     /**

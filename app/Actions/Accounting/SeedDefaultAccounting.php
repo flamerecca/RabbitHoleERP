@@ -21,6 +21,7 @@ class SeedDefaultAccounting
         ['code' => '1150', 'name' => '應收帳款', 'account_type' => AccountType::Receivable, 'setting' => 'receivable_account_id'],
         ['code' => '1300', 'name' => '存貨', 'account_type' => AccountType::Asset, 'setting' => 'inventory_account_id'],
         ['code' => '2150', 'name' => '應付帳款', 'account_type' => AccountType::Payable, 'setting' => 'payable_account_id'],
+        ['code' => '2200', 'name' => '銷項稅額', 'account_type' => AccountType::Liability, 'setting' => 'output_tax_account_id'],
         ['code' => '3100', 'name' => '股本', 'account_type' => AccountType::Equity, 'setting' => null],
         ['code' => '4100', 'name' => '銷貨收入', 'account_type' => AccountType::Income, 'setting' => 'sales_revenue_account_id'],
         ['code' => '5100', 'name' => '銷貨成本', 'account_type' => AccountType::Expense, 'setting' => 'cost_of_goods_sold_account_id'],

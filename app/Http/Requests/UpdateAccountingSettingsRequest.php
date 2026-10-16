@@ -38,6 +38,7 @@ class UpdateAccountingSettingsRequest extends FormRequest
             'cost_of_goods_sold_account_id' => $account(),
             'research_expense_account_id' => $account(),
             'inventory_adjustment_account_id' => $account(),
+            'output_tax_account_id' => ['sometimes', ...array_slice($account(AccountType::Liability), 1)],
             'sales_journal_id' => $journal(JournalType::Sales),
             'purchase_journal_id' => $journal(JournalType::Purchase),
             'general_journal_id' => $journal(JournalType::General),
