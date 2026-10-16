@@ -4,12 +4,11 @@ namespace App\Filament\Support;
 
 use App\Data\DocumentResult;
 use App\Enums\TeamPermission;
-use App\Models\Team;
 use App\Support\Rbac\DocumentPermissions;
+use App\Support\Rbac\TeamAuthorizer;
 use BackedEnum;
 use Closure;
 use Filament\Actions\Action;
-use Filament\Facades\Filament;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\Page;
 use Illuminate\Database\Eloquent\Model;
@@ -56,8 +55,6 @@ class DocumentActions
      */
     protected static function allowed(TeamPermission $permission): bool
     {
-        $team = Filament::getTenant();
-
-        return $team instanceof Team && (auth()->user()?->hasTeamPermission($team, $permission) ?? false);
+        return TeamAuthorizer::allows($permission);
     }
 }

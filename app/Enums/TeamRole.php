@@ -70,6 +70,8 @@ enum TeamRole: string
     protected static function memberPermissions(): array
     {
         return [
+            TeamPermission::ViewPosConfig,
+            TeamPermission::ViewPosPaymentMethod,
             TeamPermission::ViewProduct,
             TeamPermission::ViewProductCategory,
             TeamPermission::ViewUnitCategory,

@@ -11,6 +11,8 @@ use App\Models\Employee;
 use App\Models\GoodsReceipt;
 use App\Models\ManufacturingOrder;
 use App\Models\MaterialRequisition;
+use App\Models\PosConfig;
+use App\Models\PosPaymentMethod;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\PurchaseOrder;
@@ -43,6 +45,8 @@ enum SiteResource: string
     case GoodsReceipts = 'goods_receipts';
     case ManufacturingOrders = 'manufacturing_orders';
     case MaterialRequisitions = 'material_requisitions';
+    case PosConfigs = 'pos_configs';
+    case PosPaymentMethods = 'pos_payment_methods';
     case ProductCategories = 'product_categories';
     case Products = 'products';
     case PurchaseOrders = 'purchase_orders';
@@ -81,6 +85,8 @@ enum SiteResource: string
             self::GoodsReceipts => GoodsReceipt::class,
             self::ManufacturingOrders => ManufacturingOrder::class,
             self::MaterialRequisitions => MaterialRequisition::class,
+            self::PosConfigs => PosConfig::class,
+            self::PosPaymentMethods => PosPaymentMethod::class,
             self::ProductCategories => ProductCategory::class,
             self::Products => Product::class,
             self::PurchaseOrders => PurchaseOrder::class,

@@ -225,6 +225,16 @@ enum TeamPermission: string
     case ConfirmUnbuildOrder = 'unbuild_order:confirm';
     case CancelUnbuildOrder = 'unbuild_order:cancel';
 
+    case ViewPosConfig = 'pos_config:view';
+    case CreatePosConfig = 'pos_config:create';
+    case UpdatePosConfig = 'pos_config:update';
+    case DeletePosConfig = 'pos_config:delete';
+
+    case ViewPosPaymentMethod = 'pos_payment_method:view';
+    case CreatePosPaymentMethod = 'pos_payment_method:create';
+    case UpdatePosPaymentMethod = 'pos_payment_method:update';
+    case DeletePosPaymentMethod = 'pos_payment_method:delete';
+
     /**
      * Get the resource part of the permission value.
      */
