@@ -3,12 +3,16 @@
 namespace App\Filament\Support;
 
 use App\Enums\DocumentStatus;
+use App\Enums\PosPaymentMethodType;
+use App\Enums\JournalType;
 use App\Enums\PurchaseOrderStatus;
 use App\Enums\SalesOrderStatus;
 use App\Models\ConsignmentHold;
 use App\Models\Currency;
 use App\Models\Customer;
 use App\Models\GoodsReceipt;
+use App\Models\Journal;
+use App\Models\PosPaymentMethod;
 use App\Models\Product;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
@@ -52,6 +56,49 @@ class TeamOptions
     {
         return Warehouse::query()->where('team_id', static::team()->id)->orderBy('code')->get()
             ->mapWithKeys(fn (Warehouse $warehouse) => [$warehouse->id => "{$warehouse->code} {$warehouse->name}"])->all();
+    }
+
+    /**
+     * Get the journals of the given types in the current team.
+     *
+     * @return array<int, string>
+     */
+    public static function journalsOfType(JournalType ...$types): array
+    {
+        return Journal::query()
+            ->where('team_id', static::team()->id)
+            ->whereIn('type', array_map(fn (JournalType $type) => $type->value, $types))
+            ->orderBy('code')
+            ->get()
+            ->mapWithKeys(fn (Journal $journal) => [$journal->id => "{$journal->code} {$journal->name}"])
+            ->all();
+    }
+
+    /**
+     * Get the active POS payment methods in the current team.
+     *
+     * @return array<int, string>
+     */
+    public static function posPaymentMethods(): array
+    {
+        return PosPaymentMethod::query()
+            ->where('team_id', static::team()->id)
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->pluck('name', 'id')
+            ->all();
+    }
+
+    /**
+     * Get the POS payment method types with their translated labels.
+     *
+     * @return array<string, string>
+     */
+    public static function posPaymentMethodTypes(): array
+    {
+        return collect(PosPaymentMethodType::cases())
+            ->mapWithKeys(fn (PosPaymentMethodType $type) => [$type->value => __("pos_payment_type.{$type->value}")])
+            ->all();
     }
 
     /**
