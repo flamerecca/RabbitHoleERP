@@ -3,9 +3,11 @@
 namespace App\Actions\Pos;
 
 use App\Enums\JournalType;
+use App\Enums\PosSessionStatus;
 use App\Models\Journal;
 use App\Models\PosConfig;
 use App\Models\PosPaymentMethod;
+use App\Models\PosSession;
 use App\Models\Team;
 use App\Models\Warehouse;
 use Illuminate\Support\Facades\DB;
@@ -34,6 +36,10 @@ class SavePosConfig
             $this->ensureSalesJournal($team, (int) $attributes['sales_journal_id']);
             $this->ensureCodeIsFree($team, (string) $attributes['code'], $config);
             $this->ensurePaymentMethods($team, $paymentMethodIds, $config);
+
+            if ($config !== null) {
+                $this->ensureNoOpenSessionConflict($config, $attributes);
+            }
 
             $config ??= new PosConfig(['team_id' => $team->id]);
             $config->fill($attributes)->save();
@@ -106,6 +112,48 @@ class SavePosConfig
 
         if ($allowed !== count($paymentMethodIds)) {
             throw ValidationException::withMessages(['payment_method_ids' => __('The payment methods must be active methods of the team.')]);
+        }
+    }
+
+    /**
+     * Refuse the changes that would break an open session of the config.
+     *
+     * Deactivating the store, moving it to another warehouse or sales journal, and switching cash control would make the
+     * open session end under different rules than it started with.
+     *
+     * @param  array<string, mixed>  $attributes
+     *
+     * @throws ValidationException
+     */
+    protected function ensureNoOpenSessionConflict(PosConfig $config, array $attributes): void
+    {
+        $hasOpenSession = PosSession::query()
+            ->where('pos_config_id', $config->id)
+            ->where('status', PosSessionStatus::Open->value)
+            ->exists();
+
+        if (! $hasOpenSession) {
+            return;
+        }
+
+        $messages = [];
+
+        if (array_key_exists('is_active', $attributes) && ! $attributes['is_active'] && $config->is_active) {
+            $messages['is_active'] = __('A POS store with an open session cannot be deactivated.');
+        }
+
+        foreach (['warehouse_id', 'sales_journal_id'] as $field) {
+            if (array_key_exists($field, $attributes) && (int) $attributes[$field] !== $config->{$field}) {
+                $messages[$field] = __('This setting cannot be changed while the POS store has an open session.');
+            }
+        }
+
+        if (array_key_exists('cash_control', $attributes) && (bool) $attributes['cash_control'] !== $config->cash_control) {
+            $messages['cash_control'] = __('This setting cannot be changed while the POS store has an open session.');
+        }
+
+        if ($messages !== []) {
+            throw ValidationException::withMessages($messages);
         }
     }
 }
