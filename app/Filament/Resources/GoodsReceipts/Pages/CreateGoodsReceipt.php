@@ -17,6 +17,6 @@ class CreateGoodsReceipt extends CreateDocument
 
     protected function createDocument(Team $team, User $user, array $data): Model|DocumentResult
     {
-        return app(CreateAction::class)->handle($team, $user, DocumentForm::editableLines($data, ['purchase_order_item_id', 'quantity', 'unit_cost', 'lot_no']));
+        return app(CreateAction::class)->handle($team, $user, DocumentForm::editableLines($data, ['purchase_order_item_id', 'quantity', 'unit_cost', 'lot_no', 'lot_expiry_date']));
     }
 }

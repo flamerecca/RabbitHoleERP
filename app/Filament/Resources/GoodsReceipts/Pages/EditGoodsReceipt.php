@@ -33,7 +33,7 @@ class EditGoodsReceipt extends EditDocument
     protected function updateDocument(Model $record, array $data): Model|DocumentResult
     {
         /** @var GoodsReceipt $record */
-        return app(UpdateGoodsReceipt::class)->handle($record, DocumentForm::editableLines($data, ['purchase_order_item_id', 'quantity', 'unit_cost', 'lot_no']));
+        return app(UpdateGoodsReceipt::class)->handle($record, DocumentForm::editableLines($data, ['purchase_order_item_id', 'quantity', 'unit_cost', 'lot_no', 'lot_expiry_date']));
     }
 
     protected function itemsForForm(Model $record): array
@@ -44,6 +44,7 @@ class EditGoodsReceipt extends EditDocument
             'quantity' => (float) $item->quantity,
             'unit_cost' => (float) $item->unit_cost,
             'lot_no' => $item->lot_no,
+            'lot_expiry_date' => $item->lot_expiry_date?->toDateString(),
         ])->all());
     }
 }

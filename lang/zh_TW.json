@@ -536,5 +536,9 @@
     "Each payment needs an accepted payment method and a positive amount.": "每筆付款都需要門市接受的付款方式與大於零的金額。",
     "The payments do not cover the amount due.": "付款金額不足以支付應收金額。",
     "Payments other than cash cannot exceed the amount due.": "現金以外的付款不可超過應收金額。",
-    "Settle or cancel the draft orders before closing the session.": "請先結清或作廢草稿訂單，再關班。"
+    "Settle or cancel the draft orders before closing the session.": "請先結清或作廢草稿訂單，再關班。",
+    "Lot expiry date": "批號到期日",
+    "Only lots take an expiry date.": "只有批號可以填到期日。",
+    "The expiry date cannot be earlier than the received date.": "到期日不可早於進貨日期。",
+    "Lot :lot already has the expiry date :date.": "批號 :lot 已有到期日 :date。"
 }

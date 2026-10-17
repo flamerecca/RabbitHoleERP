@@ -91,12 +91,23 @@ class CreateGoodsReceipt
                     : __('Only products tracked by lot take a lot number.')]);
             }
 
+            $expiryDate = filled($line['lot_expiry_date'] ?? null) ? CarbonImmutable::parse($line['lot_expiry_date']) : null;
+
+            if ($expiryDate !== null && $lotNo === null) {
+                throw ValidationException::withMessages(["items.{$index}.lot_expiry_date" => __('Only lots take an expiry date.')]);
+            }
+
+            if ($expiryDate !== null && $expiryDate->startOfDay()->lt(CarbonImmutable::parse($document->received_date)->startOfDay())) {
+                throw ValidationException::withMessages(["items.{$index}.lot_expiry_date" => __('The expiry date cannot be earlier than the received date.')]);
+            }
+
             $document->items()->create([
                 'purchase_order_item_id' => $orderItem->id,
                 'product_id' => $orderItem->product_id,
                 'quantity' => $line['quantity'],
                 'unit_cost' => $line['unit_cost'],
                 'lot_no' => $lotNo,
+                'lot_expiry_date' => $expiryDate?->toDateString(),
             ]);
         }
     }

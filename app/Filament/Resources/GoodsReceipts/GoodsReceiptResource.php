@@ -71,7 +71,7 @@ class GoodsReceiptResource extends Resource
                 ->label(__('Lines'))
                 ->addActionLabel(__('Add line'))
                 ->hiddenLabel()
-                ->columns(5)
+                ->columns(6)
                 ->minItems(1)
                 ->required()
                 ->schema([
@@ -93,6 +93,10 @@ class GoodsReceiptResource extends Resource
                         ->label('Lot no')
                         ->maxLength(50)
                         ->required()
+                        ->visible(fn (Get $get) => TeamOptions::purchaseOrderLineIsLotTracked($get('purchase_order_item_id'))),
+                    DatePicker::make('lot_expiry_date')
+                        ->label(__('Lot expiry date'))
+                        ->native(false)
                         ->visible(fn (Get $get) => TeamOptions::purchaseOrderLineIsLotTracked($get('purchase_order_item_id'))),
                 ]),
         ]);

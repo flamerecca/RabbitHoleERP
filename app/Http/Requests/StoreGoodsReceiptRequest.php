@@ -28,6 +28,7 @@ class StoreGoodsReceiptRequest extends FormRequest
             'items.*.quantity' => ['required', 'numeric', 'gt:0'],
             'items.*.unit_cost' => ['required', 'numeric', 'min:0'],
             'items.*.lot_no' => ['nullable', 'string', 'max:50'],
+            'items.*.lot_expiry_date' => ['nullable', 'date_format:Y-m-d'],
         ];
     }
 }

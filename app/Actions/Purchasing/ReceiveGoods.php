@@ -11,6 +11,7 @@ use App\Enums\DocumentType;
 use App\Enums\PurchaseOrderStatus;
 use App\Enums\StockMovementType;
 use App\Models\GoodsReceipt;
+use App\Models\GoodsReceiptItem;
 use App\Models\PurchaseOrder;
 use App\Models\StockLot;
 use App\Models\User;
@@ -85,11 +86,7 @@ class ReceiveGoods
                     4,
                 );
 
-                $stockLotId = $line->lot_no === null ? null : StockLot::query()->firstOrCreate([
-                    'team_id' => $goodsReceipt->team_id,
-                    'product_id' => $line->product_id,
-                    'lot_no' => $line->lot_no,
-                ])->id;
+                $stockLotId = $line->lot_no === null ? null : $this->lotFor($goodsReceipt, $line)->id;
 
                 $this->recordStockMovement->handle(
                     reference: $line,
@@ -116,5 +113,37 @@ class ReceiveGoods
 
             return new DocumentResult($goodsReceipt->fresh(['items', 'purchaseOrder']), $warnings);
         });
+    }
+
+    /**
+     * Get the lot of a receipt line, creating it with the expiry date of the line.
+     *
+     * A lot has one expiry date: a line carrying another date than the lot already has is refused, a line without a date
+     * keeps the date of the lot, and a lot that had no date takes the date of the line.
+     *
+     * @throws ValidationException
+     */
+    protected function lotFor(GoodsReceipt $goodsReceipt, GoodsReceiptItem $line): StockLot
+    {
+        $lot = StockLot::query()->firstOrCreate(
+            ['team_id' => $goodsReceipt->team_id, 'product_id' => $line->product_id, 'lot_no' => $line->lot_no],
+            ['expiry_date' => $line->lot_expiry_date],
+        );
+
+        if ($line->lot_expiry_date === null) {
+            return $lot;
+        }
+
+        if ($lot->expiry_date === null) {
+            $lot->update(['expiry_date' => $line->lot_expiry_date]);
+
+            return $lot;
+        }
+
+        if (! $lot->expiry_date->isSameDay($line->lot_expiry_date)) {
+            throw ValidationException::withMessages(['lot_expiry_date' => __('Lot :lot already has the expiry date :date.', ['lot' => $lot->lot_no, 'date' => $lot->expiry_date->toDateString()])]);
+        }
+
+        return $lot;
     }
 }

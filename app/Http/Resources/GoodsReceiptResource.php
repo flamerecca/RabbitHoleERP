@@ -35,6 +35,7 @@ class GoodsReceiptResource extends JsonResource
                 'quantity' => (float) $item->quantity,
                 'unit_cost' => (float) $item->unit_cost,
                 'lot_no' => $item->lot_no,
+                'lot_expiry_date' => $item->lot_expiry_date?->toDateString(),
             ]),
             'created_at' => $this->created_at?->toJSON(),
             'updated_at' => $this->updated_at?->toJSON(),
