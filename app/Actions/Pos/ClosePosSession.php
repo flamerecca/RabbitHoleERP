@@ -2,8 +2,10 @@
 
 namespace App\Actions\Pos;
 
+use App\Enums\PosOrderStatus;
 use App\Enums\PosSessionStatus;
 use App\Enums\TeamPermission;
+use App\Models\PosOrder;
 use App\Models\PosSession;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -20,7 +22,7 @@ class ClosePosSession
      *
      * The session row is locked and its status checked again, so a second close of the same session is refused and
      * keeps the result of the first. The opener may close with the close permission, anybody with the close any
-     * permission may close any session of the team.
+     * permission may close any session of the team. A session with draft orders cannot be closed.
      *
      * @throws ValidationException
      */
@@ -32,6 +34,15 @@ class ClosePosSession
             abort_if($session->status !== PosSessionStatus::Open, 409, __('Only open sessions can be closed.'));
 
             abort_unless($this->mayClose($session, $user), 403, __('Your team role does not allow this action.'));
+
+            $hasDraftOrders = PosOrder::query()
+                ->where('pos_session_id', $session->id)
+                ->where('status', PosOrderStatus::Draft->value)
+                ->exists();
+
+            if ($hasDraftOrders) {
+                throw ValidationException::withMessages(['session' => __('Settle or cancel the draft orders before closing the session.')]);
+            }
 
             $attributes = [
                 'status' => PosSessionStatus::Closed,

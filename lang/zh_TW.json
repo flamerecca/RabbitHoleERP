@@ -535,5 +535,6 @@
     "The order has no lines.": "訂單沒有明細。",
     "Each payment needs an accepted payment method and a positive amount.": "每筆付款都需要門市接受的付款方式與大於零的金額。",
     "The payments do not cover the amount due.": "付款金額不足以支付應收金額。",
-    "Payments other than cash cannot exceed the amount due.": "現金以外的付款不可超過應收金額。"
+    "Payments other than cash cannot exceed the amount due.": "現金以外的付款不可超過應收金額。",
+    "Settle or cancel the draft orders before closing the session.": "請先結清或作廢草稿訂單，再關班。"
 }
