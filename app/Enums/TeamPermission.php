@@ -240,6 +240,13 @@ enum TeamPermission: string
     case ClosePosSession = 'pos_session:close';
     case CloseAnyPosSession = 'pos_session:close_any';
 
+    case ViewPosOrder = 'pos_order:view';
+    case CreatePosOrder = 'pos_order:create';
+    case UpdatePosOrder = 'pos_order:update';
+    case PayPosOrder = 'pos_order:pay';
+    case CancelPosOrder = 'pos_order:cancel';
+    case DiscountPosOrder = 'pos_order:discount';
+
     /**
      * Get the resource part of the permission value.
      */

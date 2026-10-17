@@ -12,6 +12,7 @@ use App\Models\GoodsReceipt;
 use App\Models\ManufacturingOrder;
 use App\Models\MaterialRequisition;
 use App\Models\PosConfig;
+use App\Models\PosOrder;
 use App\Models\PosPaymentMethod;
 use App\Models\PosSession;
 use App\Models\Product;
@@ -46,6 +47,7 @@ enum SiteResource: string
     case GoodsReceipts = 'goods_receipts';
     case ManufacturingOrders = 'manufacturing_orders';
     case MaterialRequisitions = 'material_requisitions';
+    case PosOrders = 'pos_orders';
     case PosConfigs = 'pos_configs';
     case PosPaymentMethods = 'pos_payment_methods';
     case PosSessions = 'pos_sessions';
@@ -87,6 +89,7 @@ enum SiteResource: string
             self::GoodsReceipts => GoodsReceipt::class,
             self::ManufacturingOrders => ManufacturingOrder::class,
             self::MaterialRequisitions => MaterialRequisition::class,
+            self::PosOrders => PosOrder::class,
             self::PosConfigs => PosConfig::class,
             self::PosPaymentMethods => PosPaymentMethod::class,
             self::PosSessions => PosSession::class,
