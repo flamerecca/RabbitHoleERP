@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Products\Schemas;
 use App\Enums\ProductTracking;
 use App\Filament\Support\TeamOptions;
 use App\Models\Product;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -47,6 +48,7 @@ class ProductForm
                             ->options(fn () => collect(ProductTracking::cases())->mapWithKeys(fn (ProductTracking $tracking) => [$tracking->value => __("tracking.{$tracking->value}")])->all())
                             ->default(fn () => Product::lotTrackingRequiredFor(TeamOptions::team()->id, null) ? ProductTracking::Lot->value : ProductTracking::None->value)
                             ->required()
+                            ->live()
                             ->helperText(__('Cannot change after the product has stock movements.')),
                         Select::make('refurbished_product_id')
                             ->label(__('Refurbished product'))
@@ -90,6 +92,11 @@ class ProductForm
                             ->options(fn (): array => TeamOptions::taxRates())
                             ->nullable()
                             ->helperText(__('POS prices include tax. The team default tax rate applies when this is empty.')),
+                        DatePicker::make('expiry_date')
+                            ->label(__('Expiry date'))
+                            ->native(false)
+                            ->visible(fn (Get $get): bool => $get('tracking') !== ProductTracking::Lot->value)
+                            ->helperText(__('For products without lot tracking. Lot tracked products take the expiry date of each lot.')),
                         TextInput::make('reorder_point')
                             ->numeric()
                             ->minValue(0)

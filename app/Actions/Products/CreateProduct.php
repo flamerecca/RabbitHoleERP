@@ -42,6 +42,10 @@ class CreateProduct
             $tracking instanceof ProductTracking ? $tracking : ProductTracking::from((string) $tracking),
         );
 
+        if (($tracking instanceof ProductTracking ? $tracking : ProductTracking::from((string) $tracking)) === ProductTracking::Lot) {
+            $attributes['expiry_date'] = null;
+        }
+
         return Product::create([
             'is_active' => true,
             'tracking' => ProductTracking::None,

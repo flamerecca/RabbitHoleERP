@@ -69,6 +69,11 @@ class UpdateProduct
             );
 
             $tracking = $attributes['tracking'] ?? $product->tracking;
+            $tracking = $tracking instanceof ProductTracking ? $tracking : ProductTracking::from((string) $tracking);
+
+            if ($tracking === ProductTracking::Lot) {
+                $attributes['expiry_date'] = null;
+            }
 
             app(EnsureRefurbishedProduct::class)->handle(
                 $product->team_id,
@@ -77,7 +82,7 @@ class UpdateProduct
                     ? ($attributes['refurbished_product_id'] === null ? null : (int) $attributes['refurbished_product_id'])
                     : $product->refurbished_product_id,
                 (int) ($attributes['unit_id'] ?? $product->unit_id),
-                $tracking instanceof ProductTracking ? $tracking : ProductTracking::from((string) $tracking),
+                $tracking,
             );
 
             $product->update($attributes);

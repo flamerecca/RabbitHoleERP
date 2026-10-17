@@ -546,5 +546,6 @@
     "Set expiry date": "設定到期日",
     "expiry.ok": "正常",
     "expiry.near": "即將到期",
-    "expiry.expired": "已過期"
+    "expiry.expired": "已過期",
+    "For products without lot tracking. Lot tracked products take the expiry date of each lot.": "沒有批號追蹤的產品使用。批號追蹤的產品以各批號的到期日為準。"
 }
