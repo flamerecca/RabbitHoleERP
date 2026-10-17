@@ -20,11 +20,12 @@ use Illuminate\Support\Carbon;
  * @property int $product_id
  * @property-read Product $product
  * @property string $lot_no
+ * @property Carbon|null $expiry_date
  * @property-read Collection<int, StockLotBalance> $balances
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['team_id', 'product_id', 'lot_no'])]
+#[Fillable(['team_id', 'product_id', 'lot_no', 'expiry_date'])]
 class StockLot extends Model
 {
     /** @use HasFactory<StockLotFactory> */
@@ -58,5 +59,17 @@ class StockLot extends Model
     public function balances(): HasMany
     {
         return $this->hasMany(StockLotBalance::class);
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'expiry_date' => 'date',
+        ];
     }
 }

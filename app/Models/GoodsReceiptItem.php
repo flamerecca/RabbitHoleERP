@@ -24,10 +24,11 @@ use Illuminate\Support\Carbon;
  * @property string $quantity
  * @property string $unit_cost
  * @property string|null $lot_no
+ * @property Carbon|null $lot_expiry_date
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['goods_receipt_id', 'purchase_order_item_id', 'product_id', 'quantity', 'unit_cost', 'lot_no'])]
+#[Fillable(['goods_receipt_id', 'purchase_order_item_id', 'product_id', 'quantity', 'unit_cost', 'lot_no', 'lot_expiry_date'])]
 class GoodsReceiptItem extends Model implements HasActivityLog
 {
     /** @use HasFactory<GoodsReceiptItemFactory> */
@@ -82,6 +83,7 @@ class GoodsReceiptItem extends Model implements HasActivityLog
         return [
             'quantity' => 'decimal:4',
             'unit_cost' => 'decimal:4',
+            'lot_expiry_date' => 'date',
         ];
     }
 }

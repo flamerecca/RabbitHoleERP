@@ -21,6 +21,7 @@ use Illuminate\Support\Carbon;
  * @property string $slug
  * @property bool $is_personal
  * @property bool $require_lot_tracking
+ * @property int $expiry_warning_days
  * @property bool $hr_enabled
  * @property bool $mrp_enabled
  * @property bool $scrap_enabled
@@ -62,7 +63,7 @@ use Illuminate\Support\Carbon;
  * @property-read Collection<int, JournalEntry> $journalEntries
  * @property-read Collection<int, Payment> $payments
  */
-#[Fillable(['name', 'slug', 'is_personal', 'require_lot_tracking', 'hr_enabled', 'mrp_enabled', 'scrap_enabled'])]
+#[Fillable(['name', 'slug', 'is_personal', 'require_lot_tracking', 'expiry_warning_days', 'hr_enabled', 'mrp_enabled', 'scrap_enabled'])]
 class Team extends Model
 {
     use GeneratesUniqueTeamSlugs;
@@ -452,6 +453,7 @@ class Team extends Model
         'hr_enabled' => false,
         'mrp_enabled' => false,
         'scrap_enabled' => false,
+        'expiry_warning_days' => 30,
     ];
 
     /**
@@ -464,6 +466,7 @@ class Team extends Model
         return [
             'is_personal' => 'boolean',
             'require_lot_tracking' => 'boolean',
+            'expiry_warning_days' => 'integer',
             'hr_enabled' => 'boolean',
             'mrp_enabled' => 'boolean',
             'scrap_enabled' => 'boolean',

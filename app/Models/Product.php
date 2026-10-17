@@ -34,6 +34,7 @@ use Illuminate\Support\Carbon;
  * @property string $name
  * @property string|null $default_purchase_price
  * @property string|null $default_sales_price
+ * @property Carbon|null $expiry_date
  * @property int|null $tax_rate_id
  * @property-read TaxRate|null $taxRate
  * @property string|null $reorder_point
@@ -48,7 +49,7 @@ use Illuminate\Support\Carbon;
  * @property-read Collection<int, ReorderingRule> $reorderingRules
  * @property-read Collection<int, ProductDiscount> $discounts
  */
-#[Fillable(['team_id', 'category_id', 'unit_id', 'purchase_unit_id', 'sku', 'barcode', 'name', 'default_purchase_price', 'default_sales_price', 'tax_rate_id', 'reorder_point', 'is_active', 'tracking', 'refurbished_product_id'])]
+#[Fillable(['team_id', 'category_id', 'unit_id', 'purchase_unit_id', 'sku', 'barcode', 'name', 'default_purchase_price', 'default_sales_price', 'expiry_date', 'tax_rate_id', 'reorder_point', 'is_active', 'tracking', 'refurbished_product_id'])]
 class Product extends Model implements HasActivityLog
 {
     /** @use HasFactory<ProductFactory> */
@@ -220,6 +221,7 @@ class Product extends Model implements HasActivityLog
             'reorder_point' => 'decimal:4',
             'is_active' => 'boolean',
             'tracking' => ProductTracking::class,
+            'expiry_date' => 'date',
         ];
     }
 }
