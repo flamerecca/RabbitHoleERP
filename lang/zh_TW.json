@@ -529,5 +529,11 @@
     "Only draft orders can be changed.": "只有草稿訂單可以修改。",
     "The session of the order is closed.": "訂單所屬的班次已關閉。",
     "The discount must be between 0 and 100 percent.": "折扣必須介於 0 到 100 之間。",
-    "This product cannot be sold at the POS.": "這個產品不能在 POS 銷售。"
+    "This product cannot be sold at the POS.": "這個產品不能在 POS 銷售。",
+    "Only draft orders can be paid.": "只有草稿訂單可以付款。",
+    "Only draft orders can be cancelled.": "只有草稿訂單可以作廢。",
+    "The order has no lines.": "訂單沒有明細。",
+    "Each payment needs an accepted payment method and a positive amount.": "每筆付款都需要門市接受的付款方式與大於零的金額。",
+    "The payments do not cover the amount due.": "付款金額不足以支付應收金額。",
+    "Payments other than cash cannot exceed the amount due.": "現金以外的付款不可超過應收金額。"
 }
