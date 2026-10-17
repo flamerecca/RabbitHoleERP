@@ -4,6 +4,7 @@ namespace App\Actions\Products;
 
 use App\Enums\ProductTracking;
 use App\Models\Product;
+use App\Models\TaxRate;
 use App\Models\Team;
 use App\Models\Unit;
 use Illuminate\Validation\ValidationException;
@@ -20,6 +21,12 @@ class CreateProduct
      */
     public function handle(Team $team, array $attributes): Product
     {
+        static::ensureTaxRateAndBarcode($team->id, $attributes, null);
+
+        if (array_key_exists('barcode', $attributes)) {
+            $attributes['barcode'] = ($attributes['barcode'] ?? null) ?: null;
+        }
+
         $attributes['purchase_unit_id'] ??= $attributes['unit_id'];
         $attributes = static::withRequiredLotTracking($team->id, $attributes['category_id'] ?? null, $attributes);
 
@@ -41,6 +48,32 @@ class CreateProduct
             ...$attributes,
             'team_id' => $team->id,
         ]);
+    }
+
+    /**
+     * Fail validation when the tax rate belongs to another team or another product of the team has the barcode.
+     *
+     * @param  array<string, mixed>  $attributes
+     *
+     * @throws ValidationException
+     */
+    public static function ensureTaxRateAndBarcode(int $teamId, array $attributes, ?int $ignoreProductId): void
+    {
+        if (($attributes['tax_rate_id'] ?? null) !== null
+            && ! TaxRate::query()->where('team_id', $teamId)->whereKey($attributes['tax_rate_id'])->exists()) {
+            throw ValidationException::withMessages(['tax_rate_id' => __('The tax rate must belong to the team.')]);
+        }
+
+        $barcode = $attributes['barcode'] ?? null;
+
+        if ($barcode !== null && $barcode !== ''
+            && Product::query()
+                ->where('team_id', $teamId)
+                ->where('barcode', $barcode)
+                ->when($ignoreProductId !== null, fn ($query) => $query->whereKeyNot($ignoreProductId))
+                ->exists()) {
+            throw ValidationException::withMessages(['barcode' => __('The barcode is already used by another product.')]);
+        }
     }
 
     /**

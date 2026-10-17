@@ -30,9 +30,12 @@ use Illuminate\Support\Carbon;
  * @property int $purchase_unit_id
  * @property-read Unit $purchaseUnit
  * @property string $sku
+ * @property string|null $barcode
  * @property string $name
  * @property string|null $default_purchase_price
  * @property string|null $default_sales_price
+ * @property int|null $tax_rate_id
+ * @property-read TaxRate|null $taxRate
  * @property string|null $reorder_point
  * @property bool $is_active
  * @property ProductTracking $tracking
@@ -45,7 +48,7 @@ use Illuminate\Support\Carbon;
  * @property-read Collection<int, ReorderingRule> $reorderingRules
  * @property-read Collection<int, ProductDiscount> $discounts
  */
-#[Fillable(['team_id', 'category_id', 'unit_id', 'purchase_unit_id', 'sku', 'name', 'default_purchase_price', 'default_sales_price', 'reorder_point', 'is_active', 'tracking', 'refurbished_product_id'])]
+#[Fillable(['team_id', 'category_id', 'unit_id', 'purchase_unit_id', 'sku', 'barcode', 'name', 'default_purchase_price', 'default_sales_price', 'tax_rate_id', 'reorder_point', 'is_active', 'tracking', 'refurbished_product_id'])]
 class Product extends Model implements HasActivityLog
 {
     /** @use HasFactory<ProductFactory> */
@@ -192,6 +195,16 @@ class Product extends Model implements HasActivityLog
     public function refurbishedFrom(): HasOne
     {
         return $this->hasOne(self::class, 'refurbished_product_id');
+    }
+
+    /**
+     * Get the tax rate POS sales of the product use, the team default applies when it is empty.
+     *
+     * @return BelongsTo<TaxRate, $this>
+     */
+    public function taxRate(): BelongsTo
+    {
+        return $this->belongsTo(TaxRate::class);
     }
 
     /**

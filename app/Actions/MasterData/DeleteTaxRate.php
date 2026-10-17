@@ -15,6 +15,7 @@ class DeleteTaxRate
     protected const REFERENCES = [
         ['purchase_order_items', 'tax_rate_id'],
         ['sales_order_items', 'tax_rate_id'],
+        ['products', 'tax_rate_id'],
     ];
 
     /**

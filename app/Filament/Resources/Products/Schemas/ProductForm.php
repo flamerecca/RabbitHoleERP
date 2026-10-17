@@ -27,6 +27,10 @@ class ProductForm
                             ->required()
                             ->maxLength(255)
                             ->scopedUnique(ignoreRecord: true),
+                        TextInput::make('barcode')
+                            ->label(__('Barcode'))
+                            ->maxLength(50)
+                            ->scopedUnique(ignoreRecord: true),
                         TextInput::make('name')
                             ->required()
                             ->maxLength(255),
@@ -81,6 +85,11 @@ class ProductForm
                             ->numeric()
                             ->minValue(0)
                             ->helperText(__('Base currency, per stock unit.')),
+                        Select::make('tax_rate_id')
+                            ->label(__('Tax rate'))
+                            ->options(fn (): array => TeamOptions::taxRates())
+                            ->nullable()
+                            ->helperText(__('POS prices include tax. The team default tax rate applies when this is empty.')),
                         TextInput::make('reorder_point')
                             ->numeric()
                             ->minValue(0)

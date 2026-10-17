@@ -24,6 +24,13 @@ class UpdateProduct
     {
         return DB::transaction(function () use ($product, $attributes) {
             $product = Product::query()->whereKey($product->getKey())->lockForUpdate()->firstOrFail();
+
+            CreateProduct::ensureTaxRateAndBarcode($product->team_id, $attributes, $product->id);
+
+            if (array_key_exists('barcode', $attributes) && $attributes['barcode'] === '') {
+                $attributes['barcode'] = null;
+            }
+
             $hasMovements = DB::table('stock_movements')->where('product_id', $product->id)->exists();
 
             abort_if(

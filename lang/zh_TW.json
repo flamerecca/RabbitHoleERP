@@ -519,5 +519,9 @@
     "Only open sessions can be closed.": "只有開啟中的班次可以關班。",
     "A POS store with an open session cannot be deactivated.": "有開啟中班次的 POS 門市不可停用。",
     "This setting cannot be changed while the POS store has an open session.": "POS 門市有開啟中的班次時不可變更這項設定。",
-    "POS stores with sessions cannot be deleted, deactivate them instead.": "已有班次的 POS 門市不可刪除，請改為停用。"
+    "POS stores with sessions cannot be deleted, deactivate them instead.": "已有班次的 POS 門市不可刪除，請改為停用。",
+    "Barcode": "條碼",
+    "POS prices include tax. The team default tax rate applies when this is empty.": "POS 價格含稅。留空時使用團隊的預設稅率。",
+    "The tax rate must belong to the team.": "稅率必須屬於本團隊。",
+    "The barcode is already used by another product.": "條碼已被其他產品使用。"
 }
