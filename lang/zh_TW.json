@@ -465,5 +465,9 @@
     "Margin rate": "毛利率",
     "No data in the period.": "期間內沒有資料。",
     "Total": "合計",
-    "The report has more than :rows rows, narrow the period or the filters to download it as a PDF.": "報表超過 :rows 列，請縮小期間或篩選條件後再下載 PDF。"
+    "The report has more than :rows rows, narrow the period or the filters to download it as a PDF.": "報表超過 :rows 列，請縮小期間或篩選條件後再下載 PDF。",
+    "Consignment holds waiting for pickup": "等待取貨的寄倉單",
+    ":warehouse holds the goods of the consignment holds below for customers. They have been kept for :days days or more and are about to expire.": ":warehouse 代客戶保管下列寄倉單的商品，已保管滿 :days 天，即將到期。",
+    "Days left": "剩餘天數",
+    "Please contact the customers to pick up the goods. Holds that are not picked up by the last day become overdue.": "請聯絡客戶前來取貨。保管期限最後一天仍未取貨的寄倉單會轉為逾期。"
 }
