@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use App\Models\StockLot;
 use App\Models\StockLotBalance;
+use App\Support\Expiry;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -25,6 +26,8 @@ class StockLotResource extends JsonResource
             'id' => $this->id,
             'product_id' => $this->product_id,
             'lot_no' => $this->lot_no,
+            'expiry_date' => $this->expiry_date?->toDateString(),
+            'expiry_status' => Expiry::statusOf($this->expiry_date, $request->route('team')->expiry_warning_days)->value,
             'quantity_on_hand' => round((float) $balances->sum('quantity_on_hand'), 4),
             'warehouses' => $balances->map(fn (StockLotBalance $balance) => [
                 'warehouse_id' => $balance->warehouse_id,

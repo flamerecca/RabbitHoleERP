@@ -2,10 +2,22 @@
 
 namespace App\Filament\Resources\StockLots;
 
+use App\Actions\Inventory\SetLotExpiryDate;
+use App\Enums\ExpiryStatus;
+use App\Enums\TeamPermission;
 use App\Filament\Resources\StockLots\Pages\ListStockLots;
+use App\Filament\Support\DomainAction;
 use App\Filament\Support\TeamOptions;
+use App\Models\StockLot;
 use App\Models\StockLotBalance;
+use App\Support\Expiry;
+use App\Support\Rbac\TeamAuthorizer;
 use BackedEnum;
+use Carbon\CarbonImmutable;
+use Filament\Actions\Action;
+use Filament\Forms\Components\DatePicker;
+use Filament\Notifications\Notification;
+use Illuminate\Database\Eloquent\Builder;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
@@ -60,6 +72,20 @@ class StockLotResource extends Resource
                 TextColumn::make('quantity_on_hand')
                     ->label('On hand')
                     ->numeric(),
+                TextColumn::make('stockLot.expiry_date')
+                    ->label(__('Expiry date'))
+                    ->date('Y-m-d')
+                    ->sortable(query: fn (Builder $query, string $direction) => $query->orderBy(StockLot::query()->select('expiry_date')->whereColumn('stock_lots.id', 'stock_lot_balances.stock_lot_id'), $direction)),
+                TextColumn::make('expiry_status')
+                    ->label(__('Expiry status'))
+                    ->state(fn (StockLotBalance $record): string => Expiry::statusOf($record->stockLot->expiry_date, TeamOptions::team()->expiry_warning_days)->value)
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'expired' => 'danger',
+                        'near' => 'warning',
+                        default => 'success',
+                    })
+                    ->formatStateUsing(fn (string $state): string => __("expiry.{$state}")),
             ])
             ->defaultSort('stock_lot_id', 'desc')
             ->filters([
@@ -70,6 +96,36 @@ class StockLotResource extends Resource
                     ->label('Product')
                     ->options(fn () => TeamOptions::products())
                     ->searchable(),
+                SelectFilter::make('expiry_status')
+                    ->label(__('Expiry status'))
+                    ->options(fn (): array => collect(ExpiryStatus::cases())->mapWithKeys(fn (ExpiryStatus $status) => [$status->value => __("expiry.{$status->value}")])->all())
+                    ->query(fn (Builder $query, array $data) => filled($data['value'] ?? null)
+                        ? $query->whereHas('stockLot', fn (Builder $lots) => Expiry::applyStatusFilter($lots, ExpiryStatus::from($data['value']), TeamOptions::team()->expiry_warning_days))
+                        : $query),
+            ])
+            ->recordActions([
+                Action::make('setExpiry')
+                    ->label(__('Set expiry date'))
+                    ->icon('heroicon-o-calendar')
+                    ->visible(fn (StockLotBalance $record): bool => static::canEdit($record) && TeamAuthorizer::allows(TeamPermission::UpdateStockLot))
+                    ->fillForm(fn (StockLotBalance $record): array => ['expiry_date' => $record->stockLot->expiry_date?->toDateString()])
+                    ->schema([
+                        DatePicker::make('expiry_date')
+                            ->label(__('Expiry date'))
+                            ->native(false),
+                    ])
+                    ->action(function (StockLotBalance $record, array $data, Action $action): void {
+                        DomainAction::run(
+                            fn () => app(SetLotExpiryDate::class)->handle(
+                                $record->stockLot,
+                                filled($data['expiry_date'] ?? null) ? CarbonImmutable::parse($data['expiry_date']) : null,
+                                auth()->user(),
+                            ),
+                            fn () => $action->halt(),
+                        );
+
+                        Notification::make()->success()->title(__('Saved.'))->send();
+                    }),
             ]);
     }
 

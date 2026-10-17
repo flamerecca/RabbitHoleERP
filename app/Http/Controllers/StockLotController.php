@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ExpiryStatus;
 use App\Http\Resources\StockLotResource;
 use App\Models\StockLot;
 use App\Models\Team;
 use Illuminate\Http\Request;
+use App\Support\Expiry;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Validation\Rule;
 
 class StockLotController extends Controller
 {
@@ -21,6 +24,7 @@ class StockLotController extends Controller
             'product_id' => ['nullable', 'integer'],
             'warehouse_id' => ['nullable', 'integer'],
             'q' => ['nullable', 'string', 'max:50'],
+            'expiry' => ['nullable', Rule::enum(ExpiryStatus::class)],
         ]);
 
         $lots = $team->stockLots()
@@ -28,6 +32,7 @@ class StockLotController extends Controller
             ->when($validated['product_id'] ?? null, fn ($query, int|string $id) => $query->where('product_id', $id))
             ->when($validated['warehouse_id'] ?? null, fn ($query, int|string $id) => $query->whereHas('balances', fn ($query) => $query->where('warehouse_id', $id)->where('quantity_on_hand', '!=', 0)))
             ->when($validated['q'] ?? null, fn ($query, string $search) => $query->whereLike('lot_no', "%{$search}%"))
+            ->when($validated['expiry'] ?? null, fn ($query, string $status) => Expiry::applyStatusFilter($query, ExpiryStatus::from($status), $team->expiry_warning_days))
             ->orderByDesc('id')
             ->paginate($validated['per_page'] ?? 15)
             ->withQueryString();

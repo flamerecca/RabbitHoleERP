@@ -122,6 +122,7 @@ enum TeamPermission: string
     case ViewStockMovement = 'stock_movement:view';
 
     case ViewStockLot = 'stock_lot:view';
+    case UpdateStockLot = 'stock_lot:update';
 
     case ViewMaterialRequisition = 'material_requisition:view';
     case CreateMaterialRequisition = 'material_requisition:create';
