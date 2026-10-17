@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Currency;
 use App\Models\Supplier;
 use App\Models\Team;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -27,7 +28,7 @@ class SupplierFactory extends Factory
             'email' => fake()->companyEmail(),
             'address' => fake()->address(),
             'tax_id' => fake()->numerify('########'),
-            'currency_id' => null,
+            'currency_id' => fn (array $attributes) => Currency::factory()->state(['team_id' => $attributes['team_id']]),
             'payment_terms' => '月結 30 天',
         ];
     }
