@@ -523,5 +523,11 @@
     "Barcode": "條碼",
     "POS prices include tax. The team default tax rate applies when this is empty.": "POS 價格含稅。留空時使用團隊的預設稅率。",
     "The tax rate must belong to the team.": "稅率必須屬於本團隊。",
-    "The barcode is already used by another product.": "條碼已被其他產品使用。"
+    "The barcode is already used by another product.": "條碼已被其他產品使用。",
+    "Orders can only be created in an open session.": "只有開啟中的班次可以建立訂單。",
+    "The customer must belong to the team.": "客戶必須屬於本團隊。",
+    "Only draft orders can be changed.": "只有草稿訂單可以修改。",
+    "The session of the order is closed.": "訂單所屬的班次已關閉。",
+    "The discount must be between 0 and 100 percent.": "折扣必須介於 0 到 100 之間。",
+    "This product cannot be sold at the POS.": "這個產品不能在 POS 銷售。"
 }
