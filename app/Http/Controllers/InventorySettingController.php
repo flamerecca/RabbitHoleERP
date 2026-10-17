@@ -14,7 +14,10 @@ class InventorySettingController extends Controller
      */
     public function show(Team $team): JsonResponse
     {
-        return response()->json(['data' => ['require_lot_tracking' => $team->require_lot_tracking]]);
+        return response()->json(['data' => [
+            'require_lot_tracking' => $team->require_lot_tracking,
+            'expiry_warning_days' => $team->expiry_warning_days,
+        ]]);
     }
 
     /**
@@ -24,8 +27,13 @@ class InventorySettingController extends Controller
     {
         $validated = $request->validate([
             'require_lot_tracking' => ['required', 'boolean'],
+            'expiry_warning_days' => ['sometimes', 'integer', 'min:1', 'max:365'],
         ]);
 
-        return $this->show($updateInventorySettings->handle($team, (bool) $validated['require_lot_tracking']));
+        return $this->show($updateInventorySettings->handle(
+            $team,
+            (bool) $validated['require_lot_tracking'],
+            isset($validated['expiry_warning_days']) ? (int) $validated['expiry_warning_days'] : null,
+        ));
     }
 }

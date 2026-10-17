@@ -547,5 +547,11 @@
     "expiry.ok": "正常",
     "expiry.near": "即將到期",
     "expiry.expired": "已過期",
-    "For products without lot tracking. Lot tracked products take the expiry date of each lot.": "沒有批號追蹤的產品使用。批號追蹤的產品以各批號的到期日為準。"
+    "For products without lot tracking. Lot tracked products take the expiry date of each lot.": "沒有批號追蹤的產品使用。批號追蹤的產品以各批號的到期日為準。",
+    "Expiry warning days": "效期警示天數",
+    "Lots and products expiring within this many days are listed as about to expire.": "在這個天數內到期的批號與產品會列為即將到期。",
+    "Expiring stock": "即將到期與已過期的庫存",
+    "Nothing is about to expire.": "目前沒有即將到期的庫存。",
+    "Lot or SKU": "批號或 SKU",
+    "Days left": "剩餘天數"
 }

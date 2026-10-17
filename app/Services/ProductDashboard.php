@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\ProductTracking;
 use App\Enums\PurchaseOrderStatus;
 use App\Enums\SalesOrderStatus;
 use App\Models\GoodsReceiptItem;
@@ -18,9 +19,11 @@ use App\Models\SalesOrder;
 use App\Models\SalesReturnItem;
 use App\Models\ShipmentItem;
 use App\Models\StockMovement;
+use App\Models\StockLotBalance;
 use App\Models\StockTakeItem;
 use App\Models\Team;
 use App\Models\WarehouseTransferItem;
+use App\Support\Expiry;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
@@ -242,5 +245,64 @@ class ProductDashboard
         }
 
         return $open;
+    }
+
+    /**
+     * Get the lots and the products without lot tracking that have stock and are expired or about to expire.
+     *
+     * Expired rows come first, then by expiry date. Lots without stock are left out.
+     *
+     * @return list<array{type: string, label: string, product: string, quantity: float, expiry_date: string, status: string, days_left: int}>
+     */
+    public function expiringStock(Team $team): array
+    {
+        $warningDays = $team->expiry_warning_days;
+        $limit = now()->addDays($warningDays)->toDateString();
+
+        $lots = StockLotBalance::query()
+            ->with(['stockLot', 'product'])
+            ->where('team_id', $team->id)
+            ->where('quantity_on_hand', '>', 0)
+            ->whereHas('stockLot', fn ($query) => $query->whereNotNull('expiry_date')->whereDate('expiry_date', '<=', $limit))
+            ->get()
+            ->groupBy('stock_lot_id')
+            ->map(fn ($balances) => [
+                'type' => 'lot',
+                'label' => $balances->first()->stockLot->lot_no,
+                'product' => $balances->first()->product->name,
+                'quantity' => round((float) $balances->sum('quantity_on_hand'), 4),
+                'date' => $balances->first()->stockLot->expiry_date,
+            ]);
+
+        $quantities = DB::table('stock_balances')->where('team_id', $team->id)->groupBy('product_id')->selectRaw('product_id, SUM(quantity_on_hand) as quantity')->pluck('quantity', 'product_id');
+
+        $products = Product::query()
+            ->where('team_id', $team->id)
+            ->where('tracking', ProductTracking::None->value)
+            ->whereNotNull('expiry_date')
+            ->whereDate('expiry_date', '<=', $limit)
+            ->get()
+            ->filter(fn (Product $product) => (float) ($quantities[$product->id] ?? 0) > 0)
+            ->map(fn (Product $product) => [
+                'type' => 'product',
+                'label' => $product->sku,
+                'product' => $product->name,
+                'quantity' => round((float) $quantities[$product->id], 4),
+                'date' => $product->expiry_date,
+            ]);
+
+        return $lots->values()->concat($products->values())
+            ->map(fn (array $row) => [
+                'type' => $row['type'],
+                'label' => $row['label'],
+                'product' => $row['product'],
+                'quantity' => $row['quantity'],
+                'expiry_date' => $row['date']->toDateString(),
+                'status' => Expiry::statusOf($row['date'], $warningDays)->value,
+                'days_left' => Expiry::daysLeft($row['date']),
+            ])
+            ->sortBy([['days_left', 'asc'], ['label', 'asc']])
+            ->values()
+            ->all();
     }
 }

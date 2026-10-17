@@ -9,6 +9,7 @@ use App\Models\Team;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
@@ -60,7 +61,10 @@ class InventorySettings extends Page
 
     public function mount(): void
     {
-        $this->form->fill(['require_lot_tracking' => TeamOptions::team()->require_lot_tracking]);
+        $this->form->fill([
+            'require_lot_tracking' => TeamOptions::team()->require_lot_tracking,
+            'expiry_warning_days' => TeamOptions::team()->expiry_warning_days,
+        ]);
     }
 
     public function form(Schema $schema): Schema
@@ -71,6 +75,14 @@ class InventorySettings extends Page
                 Toggle::make('require_lot_tracking')
                     ->label('Require lot tracking for all products')
                     ->helperText(__('Turning this on switches every product without stock movements to lot tracking, unless its category says otherwise. Turning it off does not switch products back.')),
+                TextInput::make('expiry_warning_days')
+                    ->label(__('Expiry warning days'))
+                    ->numeric()
+                    ->integer()
+                    ->minValue(1)
+                    ->maxValue(365)
+                    ->required()
+                    ->helperText(__('Lots and products expiring within this many days are listed as about to expire.')),
             ]);
     }
 
@@ -94,7 +106,7 @@ class InventorySettings extends Page
     {
         $data = $this->form->getState();
 
-        app(UpdateInventorySettings::class)->handle(TeamOptions::team(), (bool) $data['require_lot_tracking']);
+        app(UpdateInventorySettings::class)->handle(TeamOptions::team(), (bool) $data['require_lot_tracking'], (int) $data['expiry_warning_days']);
 
         Notification::make()->success()->title(__('Saved.'))->send();
     }
