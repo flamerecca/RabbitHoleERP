@@ -15,6 +15,7 @@ use App\Models\ScrapOrderItem;
 use App\Models\UnbuildOrder;
 use App\Models\UnbuildOrderItem;
 use App\Models\Payment;
+use App\Models\PosOrder;
 use App\Models\PosSession;
 use App\Models\Product;
 use App\Models\ProductDiscount;
@@ -108,6 +109,7 @@ class AppServiceProvider extends ServiceProvider
             'quotation_template' => QuotationTemplate::class,
             'quotation_template_item' => QuotationTemplateItem::class,
             'pos_session' => PosSession::class,
+            'pos_order' => PosOrder::class,
             'reordering_rule' => ReorderingRule::class,
             'purchase_order' => PurchaseOrder::class,
             'purchase_order_item' => PurchaseOrderItem::class,

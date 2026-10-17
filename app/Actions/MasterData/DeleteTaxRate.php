@@ -16,6 +16,7 @@ class DeleteTaxRate
         ['purchase_order_items', 'tax_rate_id'],
         ['sales_order_items', 'tax_rate_id'],
         ['products', 'tax_rate_id'],
+        ['pos_order_lines', 'tax_rate_id'],
     ];
 
     /**
