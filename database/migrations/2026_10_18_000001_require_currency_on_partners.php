@@ -23,7 +23,12 @@ return new class () extends Migration {
         foreach ($this->tables as $table) {
             DB::table($table)
                 ->whereNull('currency_id')
-                ->update(['currency_id' => DB::raw("(select id from currencies where currencies.team_id = {$table}.team_id and currencies.is_base = true order by id limit 1)")]);
+                ->update(['currency_id' => DB::table('currencies')
+                    ->select('id')
+                    ->whereColumn('currencies.team_id', "{$table}.team_id")
+                    ->where('is_base', true)
+                    ->orderBy('id')
+                    ->limit(1)]);
 
             Schema::table($table, function (Blueprint $blueprint) {
                 $blueprint->dropForeign(['currency_id']);

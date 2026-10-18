@@ -14,14 +14,11 @@ class CalculatePosOrderTotals
      */
     public function handle(PosOrder $order): void
     {
-        $totals = PosOrderLine::query()
-            ->where('pos_order_id', $order->id)
-            ->selectRaw('coalesce(sum(line_total), 0) as total, coalesce(sum(line_tax), 0) as tax')
-            ->first();
+        $lines = PosOrderLine::query()->where('pos_order_id', $order->id);
 
         $order->update([
-            'amount_total' => round((float) $totals->total, 4),
-            'amount_tax' => round((float) $totals->tax, 4),
+            'amount_total' => round((float) $lines->sum('line_total'), 4),
+            'amount_tax' => round((float) $lines->sum('line_tax'), 4),
         ]);
     }
 }

@@ -58,7 +58,7 @@ class RoleResource extends Resource
      */
     public static function canEdit(Model $record): bool
     {
-        return $record->name !== SiteRole::Admin->value;
+        return $record->getAttribute('name') !== SiteRole::Admin->value;
     }
 
     /**
@@ -66,7 +66,7 @@ class RoleResource extends Resource
      */
     public static function canDelete(Model $record): bool
     {
-        return ! in_array($record->name, array_column(SiteRole::cases(), 'value'), true);
+        return ! in_array($record->getAttribute('name'), array_column(SiteRole::cases(), 'value'), true);
     }
 
     public static function form(Schema $schema): Schema

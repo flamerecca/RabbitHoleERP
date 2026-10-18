@@ -44,7 +44,7 @@ class PosSessionActions
                     ->required(fn (Get $get): bool => static::cashControlOf($get('pos_config_id'))),
             ])
             ->action(function (array $data, Action $action): void {
-                $config = PosConfig::query()->where('team_id', TeamOptions::team()->id)->findOrFail($data['pos_config_id']);
+                $config = PosConfig::query()->where('team_id', TeamOptions::team()->id)->findOrFail((int) $data['pos_config_id']);
 
                 $session = DomainAction::run(
                     fn () => app(OpenPosSession::class)->handle($config, auth()->user(), isset($data['opening_cash']) ? (float) $data['opening_cash'] : null),

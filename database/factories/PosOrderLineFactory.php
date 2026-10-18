@@ -22,7 +22,7 @@ class PosOrderLineFactory extends Factory
     {
         return [
             'pos_order_id' => PosOrder::factory(),
-            'product_id' => fn (array $attributes) => Product::factory()->recycle(PosOrder::query()->findOrFail($attributes['pos_order_id'])->team)->create()->id,
+            'product_id' => fn (array $attributes) => Product::factory()->recycle(PosOrder::query()->findOrFail((int) $attributes['pos_order_id'])->team)->create()->id,
             'quantity' => 1,
             'unit_price' => 105,
             'discount_rate' => 0,

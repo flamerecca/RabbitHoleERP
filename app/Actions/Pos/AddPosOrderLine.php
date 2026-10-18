@@ -40,7 +40,7 @@ class AddPosOrderLine
 
             $price = $this->resolveSalesPrice->handle($product, now());
             $taxRate = $this->taxRateOf($product);
-            $rate = (float) ($taxRate?->rate ?? 0);
+            $rate = (float) ($taxRate->rate ?? 0);
             $amounts = $this->calculateLineAmounts->handle($quantity, (float) $price['unit_price'], $discountRate, $rate);
 
             return $order->lines()->create([

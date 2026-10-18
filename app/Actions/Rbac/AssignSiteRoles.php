@@ -29,8 +29,12 @@ class AssignSiteRoles
             $wasAdmin = $user->hasRole(SiteRole::Admin->value);
             $staysAdmin = in_array(SiteRole::Admin->value, $roleNames, true);
 
-            if ($wasAdmin && ! $staysAdmin && User::role(SiteRole::Admin->value)->lockForUpdate()->pluck('users.id')->count() <= 1) {
-                throw ValidationException::withMessages(['roles' => __('At least one admin is required.')]);
+            if ($wasAdmin && ! $staysAdmin) {
+                $adminIds = User::role(SiteRole::Admin->value)->lockForUpdate()->pluck('users.id');
+
+                if ($adminIds->count() <= 1) {
+                    throw ValidationException::withMessages(['roles' => __('At least one admin is required.')]);
+                }
             }
 
             $user->syncRoles($roleNames);

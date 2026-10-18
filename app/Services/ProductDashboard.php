@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Carbon\CarbonImmutable;
 use App\Enums\ProductTracking;
 use App\Enums\PurchaseOrderStatus;
 use App\Enums\SalesOrderStatus;
@@ -291,18 +292,19 @@ class ProductDashboard
                 'date' => $product->expiry_date,
             ]);
 
-        return $lots->values()->concat($products->values())
+        $rows = $lots->values()->concat($products->values())
             ->map(fn (array $row) => [
-                'type' => $row['type'],
-                'label' => $row['label'],
-                'product' => $row['product'],
-                'quantity' => $row['quantity'],
-                'expiry_date' => $row['date']->toDateString(),
+                'type' => (string) $row['type'],
+                'label' => (string) $row['label'],
+                'product' => (string) $row['product'],
+                'quantity' => (float) $row['quantity'],
+                'expiry_date' => CarbonImmutable::parse($row['date'])->toDateString(),
                 'status' => Expiry::statusOf($row['date'], $warningDays)->value,
                 'days_left' => Expiry::daysLeft($row['date']),
             ])
             ->sortBy([['days_left', 'asc'], ['label', 'asc']])
-            ->values()
             ->all();
+
+        return array_values($rows);
     }
 }

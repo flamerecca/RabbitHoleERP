@@ -75,7 +75,7 @@ class StockLotResource extends Resource
                 TextColumn::make('stockLot.expiry_date')
                     ->label(__('Expiry date'))
                     ->date('Y-m-d')
-                    ->sortable(query: fn (Builder $query, string $direction) => $query->orderBy(StockLot::query()->select('expiry_date')->whereColumn('stock_lots.id', 'stock_lot_balances.stock_lot_id'), $direction)),
+                    ->sortable(query: fn (Builder $query, string $direction) => $query->orderBy(StockLot::query()->select('expiry_date')->whereColumn('stock_lots.id', 'stock_lot_balances.stock_lot_id'), $direction === 'desc' ? 'desc' : 'asc')),
                 TextColumn::make('expiry_status')
                     ->label(__('Expiry status'))
                     ->state(fn (StockLotBalance $record): string => Expiry::statusOf($record->stockLot->expiry_date, TeamOptions::team()->expiry_warning_days)->value)
