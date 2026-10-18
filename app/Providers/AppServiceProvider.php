@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Actions\Pos\AddPosOrderLine;
+use App\Actions\Products\ResolveExpiredDiscountPrice;
+use App\Actions\Products\ResolveSalesPrice;
+use App\Contracts\ResolvesSalesPrice;
 use App\Models\ConsignmentHold;
 use App\Models\GoodsReceipt;
 use App\Models\GoodsReceiptItem;
@@ -48,6 +52,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
@@ -59,6 +64,8 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(NativeCosting::class);
+        $this->app->bind(ResolvesSalesPrice::class, ResolveSalesPrice::class);
+        $this->app->when(AddPosOrderLine::class)->needs(ResolvesSalesPrice::class)->give(fn (Application $app) => new ResolveExpiredDiscountPrice($app->make(ResolveSalesPrice::class)));
     }
 
     /**

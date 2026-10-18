@@ -2,12 +2,13 @@
 
 namespace App\Actions\Products;
 
+use App\Contracts\ResolvesSalesPrice;
 use App\Models\Product;
 use App\Models\ProductDiscount;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 
-class ResolveSalesPrice
+class ResolveSalesPrice implements ResolvesSalesPrice
 {
     /**
      * Resolve the unit price of a product on an order date, applying the active discount covering the date.

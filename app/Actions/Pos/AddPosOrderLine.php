@@ -2,7 +2,7 @@
 
 namespace App\Actions\Pos;
 
-use App\Actions\Products\ResolveSalesPrice;
+use App\Contracts\ResolvesSalesPrice;
 use App\Enums\TeamPermission;
 use App\Models\PosOrder;
 use App\Models\PosOrderLine;
@@ -16,7 +16,7 @@ class AddPosOrderLine
     use LocksDraftPosOrder;
 
     public function __construct(
-        protected ResolveSalesPrice $resolveSalesPrice,
+        protected ResolvesSalesPrice $resolveSalesPrice,
         protected CalculatePosLineAmounts $calculateLineAmounts,
     ) {
     }

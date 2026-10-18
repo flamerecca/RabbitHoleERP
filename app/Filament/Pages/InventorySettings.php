@@ -64,6 +64,8 @@ class InventorySettings extends Page
         $this->form->fill([
             'require_lot_tracking' => TeamOptions::team()->require_lot_tracking,
             'expiry_warning_days' => TeamOptions::team()->expiry_warning_days,
+            'sell_expired_at_discount' => TeamOptions::team()->sell_expired_at_discount,
+            'expired_discount_rate' => (float) TeamOptions::team()->expired_discount_rate,
         ]);
     }
 
@@ -83,6 +85,17 @@ class InventorySettings extends Page
                     ->maxValue(365)
                     ->required()
                     ->helperText(__('Lots and products expiring within this many days are listed as about to expire.')),
+                Toggle::make('sell_expired_at_discount')
+                    ->label(__('Sell expired stock at a discount'))
+                    ->helperText(__('When on, an expired product without lot tracking can be added at the POS at the discount below.')),
+                TextInput::make('expired_discount_rate')
+                    ->label(__('Expired stock discount'))
+                    ->numeric()
+                    ->minValue(0)
+                    ->maxValue(100)
+                    ->suffix('%')
+                    ->required()
+                    ->helperText(__('The percentage taken off the price of expired stock.')),
             ]);
     }
 
@@ -106,7 +119,7 @@ class InventorySettings extends Page
     {
         $data = $this->form->getState();
 
-        app(UpdateInventorySettings::class)->handle(TeamOptions::team(), (bool) $data['require_lot_tracking'], (int) $data['expiry_warning_days']);
+        app(UpdateInventorySettings::class)->handle(TeamOptions::team(), (bool) $data['require_lot_tracking'], (int) $data['expiry_warning_days'], (bool) $data['sell_expired_at_discount'], (float) $data['expired_discount_rate']);
 
         Notification::make()->success()->title(__('Saved.'))->send();
     }

@@ -13,15 +13,18 @@ class UpdateInventorySettings
 
     /**
      * Update whether the team requires lot tracking, switching its products to lot tracking when the requirement turns on,
-     * and the days before the expiry date from which stock counts as about to expire. The warning days stay as they are when none is given.
+     * the days before the expiry date from which stock counts as about to expire, and whether expired stock is sold at a discount of the given percentage.
+     * Each setting stays as it is when none is given.
      */
-    public function handle(Team $team, bool $requireLotTracking, ?int $expiryWarningDays = null): Team
+    public function handle(Team $team, bool $requireLotTracking, ?int $expiryWarningDays = null, ?bool $sellExpiredAtDiscount = null, ?float $expiredDiscountRate = null): Team
     {
-        return DB::transaction(function () use ($team, $requireLotTracking, $expiryWarningDays) {
+        return DB::transaction(function () use ($team, $requireLotTracking, $expiryWarningDays, $sellExpiredAtDiscount, $expiredDiscountRate) {
             $wasRequired = $team->require_lot_tracking;
             $team->update(array_filter([
                 'require_lot_tracking' => $requireLotTracking,
                 'expiry_warning_days' => $expiryWarningDays,
+                'sell_expired_at_discount' => $sellExpiredAtDiscount,
+                'expired_discount_rate' => $expiredDiscountRate,
             ], fn (mixed $value) => $value !== null));
 
             if (! $wasRequired && $requireLotTracking) {
