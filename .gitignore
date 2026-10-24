@@ -25,6 +25,9 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+/.claude
+/.codegraph
+.DS_Store
 /docs
 /.ai
 /openapi.yaml
